@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BAR BOSS — инвентаризация (v3.11.1)</title>
+<title>BAR BOSS — инвентаризация (v3.11.2)</title>
 <meta name="theme-color" content="#0e0f13">
 <style>
 html,body{height:100%}
@@ -37,19 +37,10 @@ button.danger{background:#ff3b30;color:#fff}
 .result{padding:10px;border:1px dashed #2a2e3f;border-radius:10px;background:#0b0d16;margin-top:10px}
 .big{font-size:24px;font-weight:900;color:#ffd400}
 .badge{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #2a2e3f;background:#0b0d16;color:#9aa;font-size:12px;margin-right:6px;margin-top:4px}
-.notice{background:#3b1f1f;border:1px solid #6f2d2d;color:#ffdede;padding:10px;border-radius:10px;margin:10px 0;white-space:pre-wrap}
 .footer{opacity:.7;font-size:12px;margin-top:8px}
 .kv{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.hidden{display:none !important}          /* важное изменение */
-#modal{display:flex}                      /* когда НЕ скрыт — flex */
-
-/* chips */
-.chips{display:flex;gap:8px;overflow:auto;padding:6px 0}
-.chip{flex:0 0 auto;padding:8px 12px;border:1px solid #2a2e3f;border-radius:999px;background:#0b0d16;color:#eaeaea;cursor:pointer;font-size:14px}
-.chip:hover{border-color:#3a3f55}
-.chip.active{background:#ffd400;color:#111;border-color:#ffd400;font-weight:800}
-.chips::-webkit-scrollbar{height:6px}
-.chips::-webkit-scrollbar-thumb{background:#2a2e3f;border-radius:999px}
+.hidden{display:none !important}
+#modal{display:flex}
 
 /* DB toolbar */
 #db-toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:8px}
@@ -63,7 +54,7 @@ button.danger{background:#ff3b30;color:#fff}
 <body>
 <div class="header">
   <div class="container" style="display:flex;flex-direction:column;gap:8px">
-    <h1>BAR BOSS — инвентаризация (v3.11.1)</h1>
+    <h1>BAR BOSS — инвентаризация (v3.11.2)</h1>
     <div class="tabs">
       <button class="tab active" data-tab="calc" type="button">Калькулятор</button>
       <button class="tab" data-tab="db" type="button">База</button>
@@ -80,12 +71,10 @@ button.danger{background:#ff3b30;color:#fff}
         <div class="row">
           <label>Вид алкоголя</label>
           <select id="cat-select"></select>
-          <div id="cat-chips" class="chips"></div>
         </div>
         <div class="row">
           <label>Подкатегория</label>
           <select id="subcat-select"></select>
-          <div id="subcat-chips" class="chips"></div>
         </div>
         <div class="row">
           <label>Поиск</label>
@@ -173,10 +162,10 @@ button.danger{background:#ff3b30;color:#fff}
     </div>
   </section>
 
-  <div class="footer">BAR BOSS • v3.11.1 • GitHub Pages версия • без сервис-воркеров, максимум совместимости (iOS/вебвью).</div>
+  <div class="footer">BAR BOSS • v3.11.2 • GitHub Pages версия • без сервис-воркеров, максимум совместимости (iOS/вебвью).</div>
 </div>
 
-<!-- Модал добавления (исправлено: без display:flex в inline-стиле) -->
+<!-- Модал добавления — без display:flex в inline-стиле -->
 <div id="modal" class="hidden"
      style="position:fixed;inset:0;background:rgba(0,0,0,.55);
             align-items:center;justify-content:center;z-index:50;padding:16px">
@@ -205,7 +194,7 @@ button.danger{background:#ff3b30;color:#fff}
 <script>
 (function(){
 'use strict';
-var VER='3.11.1';
+var VER='3.11.2';
 function $(id){return document.getElementById(id);}
 function fmt(n){return isFinite(n)?Math.round(n):0;}
 function slug(s){return (String(s||'').toLowerCase().replace(/[^a-z0-9а-яё]+/gi,'-').replace(/^-+|-+$/g,'')+'-'+Math.floor(Math.random()*1e6).toString(36));}
@@ -237,20 +226,6 @@ var CATEGORIES = {
     "Ламбаног","Лао-Лао"
   ]
 };
-// быстрые чипы:
-var FEATURED_CATS = ["Водка","Виски","Джин и семейство","Ром","Текила","Мескаль и агавовые","Ликёры (сладкие)","Амаро/горькие ликёры","Вермуты и аперитивы","Азиатские дистилляты"];
-var POP_SUB = {
-  "Водка":["Классическая","Ароматизированная"],
-  "Виски":["Бурбон","Шотландский односолодовый","Ирландский","Японский"],
-  "Джин и семейство":["Лондонский сухой","Олд Том","Дженевер/Йеневер"],
-  "Ром":["Ямайский","Агриколь","Тёмный","Лёгкий (кубинский)"],
-  "Текила":["Бланко","Репосадо","Аньехо"],
-  "Мескаль и агавовые":["Мескаль (односортовой)","Сотоль"],
-  "Ликёры (сладкие)":["Цитрусовые (Triple Sec/Куантро/Курасао)","Кофейные","Сливочные"],
-  "Амаро/горькие ликёры":["Фернет","Итальянские амаро (общ.)"],
-  "Вермуты и аперитивы":["Вермут сухой","Вермут сладкий","Биттер-аперитив (красный)"],
-  "Азиатские дистилляты":["Байцзю — сильный аромат","Сётю — имо (батат)","Соджу — классический"]
-};
 
 var DEFAULT_DB = [
   {id:"absolut-700",name:"Absolut Vodka 700",category:"Водка",subcat:"Классическая",cap_ml:700,abv_pct:40,tare_g:420},
@@ -277,28 +252,6 @@ function DBMAP(){var o={};for(var i=0;i<DB.length;i++){o[DB[i].id]=DB[i]}return 
 function setOptions(el,arr,withAll){var html=withAll?'<option value="">Все</option>':'';for(var i=0;i<arr.length;i++){html+='<option>'+arr[i]+'</option>'}el.innerHTML=html}
 function fillCats(){ setOptions($('cat-select'), Object.keys(CATEGORIES), false) }
 function fillSubs(){ setOptions($('subcat-select'), CATEGORIES[$('cat-select').value]||[], true) }
-function renderCatChips(){
-  var box=$('cat-chips'), html='';
-  FEATURED_CATS.forEach(k=>html+='<div class="chip" data-cat="'+k+'">'+k+'</div>');
-  box.innerHTML=html;
-  Array.from(box.children).forEach(ch=>{
-    ch.addEventListener('click', ()=>{ $('cat-select').value=ch.dataset.cat; fillSubs(); renderSubcatChips(); fillBottles(); saveCalcState(); highlightChips() })
-  });
-  highlightChips();
-}
-function renderSubcatChips(){
-  var box=$('subcat-chips'), cat=$('cat-select').value, subs=POP_SUB[cat]||[], html='';
-  subs.forEach(s=>html+='<div class="chip" data-sub="'+s+'">'+s+'</div>');
-  box.innerHTML=html;
-  Array.from(box.children).forEach(ch=>{
-    ch.addEventListener('click', ()=>{ $('subcat-select').value=ch.dataset.sub; fillBottles(); saveCalcState(); highlightChips() })
-  });
-  highlightChips();
-}
-function highlightChips(){
-  Array.from($('cat-chips').children).forEach(c=>c.classList.toggle('active',c.dataset.cat===$('cat-select').value));
-  Array.from($('subcat-chips').children).forEach(c=>c.classList.toggle('active',c.dataset.sub===$('subcat-select').value));
-}
 function fillBottles(){
   var cat=$('cat-select').value, sub=$('subcat-select').value, q=String($('search-bottle').value||'').toLowerCase();
   var list=DB.filter(b=>(!cat||b.category===cat)&&(!sub||sub==='Все'||b.subcat===sub)&&(!q||b.name.toLowerCase().includes(q)));
@@ -329,7 +282,7 @@ function saveCalcState(){
 }
 function loadCalcState(){
   var st=getStore('bb_calc_v311',null); if(!st) return;
-  $('cat-select').value=st.cat||$('cat-select').value; fillSubs(); $('subcat-select').value=st.sub||''; renderCatChips(); renderSubcatChips();
+  $('cat-select').value=st.cat||$('cat-select').value; fillSubs(); $('subcat-select').value=st.sub||''; 
   $('search-bottle').value=st.q||''; fillBottles(); if(st.id&&DBMAP()[st.id]){ $('bottle-select').value=st.id; loadPassport(st.id) }
   $('gross').value=st.gross||''; $('hTot').value=st.hTot||''; $('hLiq').value=st.hLiq||''; validateCalc();
 }
@@ -339,11 +292,16 @@ function calculate(){
   if(!validateCalc())return;
   var b=DBMAP()[$('bottle-select').value]; if(!b){$('note').textContent='Выберите бутылку';return}
   var gross=Number($('gross').value), hTot=Number($('hTot').value), hLiq=Number($('hLiq').value);
-  var net=Math.max(0,gross-b.tare_g), vM=vMass(net,b.abv_pct), vG=vGeom(b.cap_ml,hLiq,hTot),
-      V=(vM>0&&vG>0)?(vM+vG)/2:(vM>0?vM:vg);
-  var vg=vG; // чтобы не потерять переменную при формуле
-  V=Math.max(0,Math.min(b.cap_ml,V)); var pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0;
-  $('res').innerHTML='<div class="big">≈ '+fmt(V)+' мл</div><div class="kv"><span class="badge">по массе: '+fmt(vM)+' мл</span><span class="badge">по высоте: '+fmt(vg)+' мл</span><span class="badge">заполнено ≈ '+fmt(pct)+'%</span></div>';
+  var net=Math.max(0,gross-b.tare_g);
+  var vM=vMass(net,b.abv_pct);
+  var vG=vGeom(b.cap_ml,hLiq,hTot);
+  var V;
+  if(vM>0 && vG>0){ V=(vM+vG)/2; }
+  else if(vM>0){ V=vM; }
+  else { V=vG; }
+  V=Math.max(0,Math.min(b.cap_ml,V));
+  var pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0;
+  $('res').innerHTML='<div class="big">≈ '+fmt(V)+' мл</div><div class="kv"><span class="badge">по массе: '+fmt(vM)+' мл</span><span class="badge">по высоте: '+fmt(vG)+' мл</span><span class="badge">заполнено ≈ '+fmt(pct)+'%</span></div>';
 }
 
 // база
@@ -429,14 +387,13 @@ function renderSess(){
 
 // инициализация
 function init(){
-  fillCats(); fillSubs(); renderCatChips(); renderSubcatChips();
-  fillBottles(); renderDB(); sessBottleList(''); renderSess(); loadCalcState();
+  fillCats(); fillSubs(); fillBottles(); renderDB(); sessBottleList(''); renderSess(); loadCalcState();
 }
 init();
 
 // события
-$('cat-select').addEventListener('change',()=>{fillSubs(); renderSubcatChips(); fillBottles(); saveCalcState(); highlightChips()});
-$('subcat-select').addEventListener('change',()=>{fillBottles(); saveCalcState(); highlightChips()});
+$('cat-select').addEventListener('change',()=>{fillSubs(); fillBottles(); saveCalcState()});
+$('subcat-select').addEventListener('change',()=>{fillBottles(); saveCalcState()});
 $('search-bottle').addEventListener('input',()=>{fillBottles(); saveCalcState()});
 $('bottle-select').addEventListener('change',e=>loadPassport(e.target.value));
 qsa('#gross,#hTot,#hLiq').forEach(el=>el.addEventListener('input',()=>{validateCalc(); saveCalcState()}));
@@ -469,4 +426,3 @@ $('sess-search').addEventListener('input',()=>sessBottleList($('sess-search').va
 </script>
 </body>
 </html>
-
