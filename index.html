@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BAR BOSS — инвентаризация (v3.11.0)</title>
+<title>BAR BOSS — инвентаризация (v3.11.1)</title>
 <meta name="theme-color" content="#0e0f13">
 <style>
 html,body{height:100%}
@@ -40,7 +40,8 @@ button.danger{background:#ff3b30;color:#fff}
 .notice{background:#3b1f1f;border:1px solid #6f2d2d;color:#ffdede;padding:10px;border-radius:10px;margin:10px 0;white-space:pre-wrap}
 .footer{opacity:.7;font-size:12px;margin-top:8px}
 .kv{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.hidden{display:none}
+.hidden{display:none !important}          /* важное изменение */
+#modal{display:flex}                      /* когда НЕ скрыт — flex */
 
 /* chips */
 .chips{display:flex;gap:8px;overflow:auto;padding:6px 0}
@@ -62,7 +63,7 @@ button.danger{background:#ff3b30;color:#fff}
 <body>
 <div class="header">
   <div class="container" style="display:flex;flex-direction:column;gap:8px">
-    <h1>BAR BOSS — инвентаризация (v3.11.0)</h1>
+    <h1>BAR BOSS — инвентаризация (v3.11.1)</h1>
     <div class="tabs">
       <button class="tab active" data-tab="calc" type="button">Калькулятор</button>
       <button class="tab" data-tab="db" type="button">База</button>
@@ -172,11 +173,13 @@ button.danger{background:#ff3b30;color:#fff}
     </div>
   </section>
 
-  <div class="footer">BAR BOSS • v3.11.0 • GitHub Pages версия • без сервис-воркеров, максимум совместимости (iOS/вебвью).</div>
+  <div class="footer">BAR BOSS • v3.11.1 • GitHub Pages версия • без сервис-воркеров, максимум совместимости (iOS/вебвью).</div>
 </div>
 
-<!-- Модал добавления -->
-<div id="modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px">
+<!-- Модал добавления (исправлено: без display:flex в inline-стиле) -->
+<div id="modal" class="hidden"
+     style="position:fixed;inset:0;background:rgba(0,0,0,.55);
+            align-items:center;justify-content:center;z-index:50;padding:16px">
   <div class="box" style="max-width:640px;width:100%;background:#0f111a;border:1px solid #2a2e3f;border-radius:16px;overflow:hidden">
     <h3 style="margin:0;padding:12px 14px;border-bottom:1px solid #2a2e3f;background:#121420">Добавить бутылку</h3>
     <div class="body" style="padding:14px">
@@ -202,7 +205,7 @@ button.danger{background:#ff3b30;color:#fff}
 <script>
 (function(){
 'use strict';
-var VER='3.11.0';
+var VER='3.11.1';
 function $(id){return document.getElementById(id);}
 function fmt(n){return isFinite(n)?Math.round(n):0;}
 function slug(s){return (String(s||'').toLowerCase().replace(/[^a-z0-9а-яё]+/gi,'-').replace(/^-+|-+$/g,'')+'-'+Math.floor(Math.random()*1e6).toString(36));}
@@ -337,9 +340,10 @@ function calculate(){
   var b=DBMAP()[$('bottle-select').value]; if(!b){$('note').textContent='Выберите бутылку';return}
   var gross=Number($('gross').value), hTot=Number($('hTot').value), hLiq=Number($('hLiq').value);
   var net=Math.max(0,gross-b.tare_g), vM=vMass(net,b.abv_pct), vG=vGeom(b.cap_ml,hLiq,hTot),
-      V=(vM>0&&vG>0)?(vM+vG)/2:(vM>0?vM:vG);
+      V=(vM>0&&vG>0)?(vM+vG)/2:(vM>0?vM:vg);
+  var vg=vG; // чтобы не потерять переменную при формуле
   V=Math.max(0,Math.min(b.cap_ml,V)); var pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0;
-  $('res').innerHTML='<div class="big">≈ '+fmt(V)+' мл</div><div class="kv"><span class="badge">по массе: '+fmt(vM)+' мл</span><span class="badge">по высоте: '+fmt(vG)+' мл</span><span class="badge">заполнено ≈ '+fmt(pct)+'%</span></div>';
+  $('res').innerHTML='<div class="big">≈ '+fmt(V)+' мл</div><div class="kv"><span class="badge">по массе: '+fmt(vM)+' мл</span><span class="badge">по высоте: '+fmt(vg)+' мл</span><span class="badge">заполнено ≈ '+fmt(pct)+'%</span></div>';
 }
 
 // база
@@ -465,5 +469,4 @@ $('sess-search').addEventListener('input',()=>sessBottleList($('sess-search').va
 </script>
 </body>
 </html>
-</body>
-</html>
+
