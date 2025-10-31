@@ -3,17 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BAR BOSS — v3.10.0 (GitHub Pages)</title>
+<title>BAR BOSS — инвентаризация (v3.11.0)</title>
 <meta name="theme-color" content="#0e0f13">
 <style>
 html,body{height:100%}
 *{box-sizing:border-box}
 body{margin:0;background:#0e0f13;color:#f5f5f5;font:16px/1.45 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial}
 .container{max-width:1100px;margin:0 auto;padding:16px}
-.header{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1f2230;background:#0e0f13;position:sticky;top:0;z-index:5}
-.logo{width:36px;height:36px;display:grid;place-items:center;background:#ffd400;color:#111;border-radius:10px;font-weight:900}
+.header{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid #1f2230;background:#0e0f13;position:sticky;top:0;z-index:5}
 h1{margin:0;font-size:20px;font-weight:900}
-.tabs{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
 .tab{padding:8px 12px;border:1px solid #1f2230;border-radius:10px;background:#0b0d16;color:#fff;cursor:pointer}
 .tab.active{background:#ffd400;color:#111;font-weight:800}
 .card{background:#121420;border:1px solid #1f2230;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.35);overflow:hidden;margin-top:16px}
@@ -35,56 +34,64 @@ button.ok{background:#2ecc71;color:#fff}
 button.warn{background:#ff9500;color:#111}
 button.danger{background:#ff3b30;color:#fff}
 .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.actions>button{flex:0 0 auto}
 .result{padding:10px;border:1px dashed #2a2e3f;border-radius:10px;background:#0b0d16;margin-top:10px}
 .big{font-size:24px;font-weight:900;color:#ffd400}
 .badge{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #2a2e3f;background:#0b0d16;color:#9aa;font-size:12px;margin-right:6px;margin-top:4px}
 .notice{background:#3b1f1f;border:1px solid #6f2d2d;color:#ffdede;padding:10px;border-radius:10px;margin:10px 0;white-space:pre-wrap}
 .footer{opacity:.7;font-size:12px;margin-top:8px}
 .kv{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
-.modal .box{max-width:640px;width:100%;background:#0f111a;border:1px solid #2a2e3f;border-radius:16px;box-shadow:0 18px 60px rgba(0,0,0,.5);overflow:hidden}
-.modal .box h3{margin:0;padding:12px 14px;border-bottom:1px solid #2a2e3f;background:#121420}
-.modal .box .body{padding:14px}
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{border-bottom:1px solid #1f2230;padding:8px 6px;text-align:left;vertical-align:top}
-.table th{color:#a3a8b3;font-weight:600}
-.table input,.table select{height:36px}
-.link{color:#ffd400;text-decoration:underline;cursor:pointer}
 .hidden{display:none}
-select,button{min-height:44px;white-space:nowrap}
-/* sticky calculate on mobile */
-@media (max-width: 480px){
+
+/* chips */
+.chips{display:flex;gap:8px;overflow:auto;padding:6px 0}
+.chip{flex:0 0 auto;padding:8px 12px;border:1px solid #2a2e3f;border-radius:999px;background:#0b0d16;color:#eaeaea;cursor:pointer;font-size:14px}
+.chip:hover{border-color:#3a3f55}
+.chip.active{background:#ffd400;color:#111;border-color:#ffd400;font-weight:800}
+.chips::-webkit-scrollbar{height:6px}
+.chips::-webkit-scrollbar-thumb{background:#2a2e3f;border-radius:999px}
+
+/* DB toolbar */
+#db-toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:8px}
+
+/* sticky calc on mobile */
+@media (max-width: 520px){
   .sticky-actions{position:sticky;bottom:8px;z-index:4;background:#121420d9;backdrop-filter:saturate(120%) blur(6px);padding:8px;border-radius:12px;border:1px solid #1f2230}
 }
 </style>
 </head>
 <body>
 <div class="header">
-  <div class="container" style="display:flex;align-items:center;gap:12px">
-    <div class="logo">BB</div>
-    <div>
-      <h1>BAR BOSS — инвентаризация (v3.10.0)</h1>
-      <div class="tabs">
-        <button class="tab active" data-tab="calc" type="button">Калькулятор</button>
-        <button class="tab" data-tab="db" type="button">База</button>
-        <button class="tab" data-tab="session" type="button">Сессия</button>
-      </div>
+  <div class="container" style="display:flex;flex-direction:column;gap:8px">
+    <h1>BAR BOSS — инвентаризация (v3.11.0)</h1>
+    <div class="tabs">
+      <button class="tab active" data-tab="calc" type="button">Калькулятор</button>
+      <button class="tab" data-tab="db" type="button">База</button>
+      <button class="tab" data-tab="session" type="button">Сессия</button>
     </div>
   </div>
 </div>
 
 <div class="container">
-  <div id="err" class="notice" style="display:none"></div>
-
   <section id="tab-calc" class="card">
     <h2>Калькулятор по профилю бутылки</h2>
     <div class="body">
       <div class="grid grid-3">
-        <div class="row"><label>Вид алкоголя</label><select id="cat-select"></select></div>
-        <div class="row"><label>Подкатегория</label><select id="subcat-select"></select></div>
-        <div class="row"><label>Поиск</label><input id="search-bottle" placeholder="Начните печатать..."></div>
+        <div class="row">
+          <label>Вид алкоголя</label>
+          <select id="cat-select"></select>
+          <div id="cat-chips" class="chips"></div>
+        </div>
+        <div class="row">
+          <label>Подкатегория</label>
+          <select id="subcat-select"></select>
+          <div id="subcat-chips" class="chips"></div>
+        </div>
+        <div class="row">
+          <label>Поиск</label>
+          <input id="search-bottle" placeholder="Начните печатать...">
+        </div>
       </div>
+
       <div class="grid grid-3" style="margin-top:8px">
         <div class="row"><label>Бутылка</label><select id="bottle-select"></select></div>
         <div class="row">
@@ -96,21 +103,25 @@ select,button{min-height:44px;white-space:nowrap}
         </div>
         <div class="row"></div>
       </div>
+
       <div class="grid grid-3" style="margin-top:8px">
         <div class="row"><label>Номинал, мл</label><input id="cap" disabled></div>
         <div class="row"><label>Крепость, %</label><input id="abv" disabled></div>
         <div class="row"><label>Пустая тара, г</label><input id="tare" disabled></div>
       </div>
+
       <div class="grid grid-3" style="margin-top:8px">
-        <div class="row"><label>Вес сейчас, г</label><input id="gross" type="number" inputmode="decimal"></div>
-        <div class="row"><label>Высота бутылки, см</label><input id="hTot" type="number" inputmode="numeric"></div>
-        <div class="row"><label>Уровень жидкости, см</label><input id="hLiq" type="number" inputmode="numeric"></div>
+        <div class="row"><label>Вес сейчас, г</label><input id="gross" type="number" inputmode="decimal" placeholder="например, 1009"></div>
+        <div class="row"><label>Высота бутылки, см</label><input id="hTot" type="number" inputmode="numeric" placeholder="например, 22"></div>
+        <div class="row"><label>Уровень жидкости, см</label><input id="hLiq" type="number" inputmode="numeric" placeholder="например, 10"></div>
       </div>
+
       <div class="actions sticky-actions" style="margin-top:8px">
         <button class="ok" id="calc" type="button">Рассчитать</button>
         <div id="note"></div>
         <button class="sec" id="btn-refresh" type="button" title="Обновить кэш">Обновить кэш</button>
       </div>
+
       <div id="res" class="result"></div>
 
       <div class="row" style="margin-top:10px">
@@ -123,17 +134,12 @@ select,button{min-height:44px;white-space:nowrap}
   <section id="tab-db" class="card hidden">
     <h2>База бутылок</h2>
     <div class="body">
-      <div class="actions">
+      <div id="db-toolbar">
         <button id="db-add" class="sec" type="button">Добавить бутылку</button>
-        <button id="db-export-json" type="button">Экспорт JSON</button>
-        <div class="actions">
-          <label style="font-size:12px;color:#a3a8b3">Разделитель CSV</label>
-          <select id="csv-delim"><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select>
-          <button id="db-export-csv" type="button">Экспорт CSV</button>
-        </div>
-        <button id="db-import-json" class="sec" type="button">Импорт JSON</button>
+        <label for="csv-delim" style="font-size:12px;color:#a3a8b3">Разделитель CSV</label>
+        <select id="csv-delim"><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select>
+        <button id="db-export-csv" type="button">Экспорт CSV</button>
         <button id="db-import-csv" class="sec" type="button">Импорт CSV</button>
-        <input id="file-json" type="file" accept="application/json" class="hidden">
         <input id="file-csv" type="file" accept=".csv,text/csv" class="hidden">
         <button id="db-reset" class="danger" type="button">Сбросить базу</button>
         <div id="db-msg" class="badge"></div>
@@ -147,8 +153,9 @@ select,button{min-height:44px;white-space:nowrap}
     <div class="body">
       <div class="actions">
         <button id="sess-new" class="ok" type="button">Новая сессия</button>
+        <label for="csv-delim2" style="font-size:12px;color:#a3a8b3">Разделитель CSV</label>
+        <select id="csv-delim2"><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select>
         <button id="sess-export-csv" class="sec" type="button">Экспорт CSV</button>
-        <button id="sess-export-json" class="sec" type="button">Экспорт JSON</button>
         <div class="badge" id="sess-info"></div>
       </div>
       <div class="grid grid-3">
@@ -165,14 +172,14 @@ select,button{min-height:44px;white-space:nowrap}
     </div>
   </section>
 
-  <div id="err2" class="notice" style="display:none"></div>
-  <div class="footer">BAR BOSS • v3.10.0 • GitHub Pages версия • без сервис-воркеров, максимум совместимости (iOS/вебвью).</div>
+  <div class="footer">BAR BOSS • v3.11.0 • GitHub Pages версия • без сервис-воркеров, максимум совместимости (iOS/вебвью).</div>
 </div>
 
-<div id="modal" class="modal" aria-hidden="true">
-  <div class="box">
-    <h3>Добавить бутылку</h3>
-    <div class="body">
+<!-- Модал добавления -->
+<div id="modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px">
+  <div class="box" style="max-width:640px;width:100%;background:#0f111a;border:1px solid #2a2e3f;border-radius:16px;overflow:hidden">
+    <h3 style="margin:0;padding:12px 14px;border-bottom:1px solid #2a2e3f;background:#121420">Добавить бутылку</h3>
+    <div class="body" style="padding:14px">
       <div class="grid grid-3">
         <div class="row"><label>Вид алкоголя</label><select id="m-cat"></select></div>
         <div class="row"><label>Подкатегория</label><select id="m-sub"></select></div>
@@ -195,340 +202,268 @@ select,button{min-height:44px;white-space:nowrap}
 <script>
 (function(){
 'use strict';
-var VER='3.10.0';
-function $(id){ return document.getElementById(id); }
-function showErr(id,msg){ var e=$(id); e.style.display='block'; e.textContent=msg; }
-function fmt(n){ return isFinite(n)?Math.round(n):0; }
-function slug(s){ return (String(s||'').toLowerCase().replace(/[^a-z0-9а-яё]+/gi,'-').replace(/^-+|-+$/g,'') + '-' + Math.floor(Math.random()*1e6).toString(36)); }
-function uniqKey(n,c,sb){ return [String(n||'').trim().toLowerCase(), String(c||'').toLowerCase(), String(sb||'').toLowerCase()].join('||'); }
-function qsa(sel){ return document.querySelectorAll(sel); }
+var VER='3.11.0';
+function $(id){return document.getElementById(id);}
+function fmt(n){return isFinite(n)?Math.round(n):0;}
+function slug(s){return (String(s||'').toLowerCase().replace(/[^a-z0-9а-яё]+/gi,'-').replace(/^-+|-+$/g,'')+'-'+Math.floor(Math.random()*1e6).toString(36));}
+function uniqKey(n,c,sb){return [String(n||'').trim().toLowerCase(),String(c||'').toLowerCase(),String(sb||'').toLowerCase()].join('||');}
+function qsa(sel){return document.querySelectorAll(sel);}
 
-var CAT_LABELS = {
-  "vodka":"Водка","whisky":"Виски","gin":"Джин","tequila":"Текила","rum":"Ром",
-  "liqueur":"Ликёры","bitters":"Биттеры","amaro":"Амаро","mezcal":"Мескаль","asian":"Азиатский алкоголь",
-  "red_wine":"Красное вино","white_wine":"Белое вино","sparkling":"Игристое","other":"Другое"
+var CATEGORIES = {
+  "Водка":["Классическая","Пшеничная","Ржаная","Картофельная","Ароматизированная"],
+  "Виски":["Шотландский купажированный","Шотландский односолодовый","Ирландский","Бурбон","Ржаной","Кукурузный","Теннессийский","Канадский","Японский"],
+  "Бренди (виноградный/фруктовый)":["Коньяк","Арманьяк","Кальвадос","Писко","Граппа/Марка","Орухо","Виноградный бренди (общ.)","Сливовица/Ракия","Абрикосовый/Грушевый"],
+  "Ром":["Лёгкий (кубинский)","Золотой","Тёмный","Пряный","Ямайский","Демерара","Барбадос","Агриколь","Navy/Overproof"],
+  "Кашаса":["Белая","Золотая/Отлежавшая","Пряная/Ароматизированная"],
+  "Текила":["Бланко","Репосадо","Аньехо","Экстра Аньехо","Миксто"],
+  "Мескаль и агавовые":["Мескаль (энсабле)","Мескаль (односортовой)","Бакынора","Райсилья","Сотоль"],
+  "Джин и семейство":["Лондонский сухой","Олд Том","Плимутский","Дженевер/Йеневер","Sloe gin"],
+  "Анисовые":["Абсент","Пастис","Узо","Самбука","Арак (Левант)"],
+  "Аквавит":["Дилла/Тмин","Кардамон/Пряный","Прочие скандинавские стили"],
+  "Амаро/горькие ликёры":["Фернет","Итальянские амаро (общ.)","Травяные биттер-ликёры"],
+  "Ликёры (сладкие)":["Цитрусовые (Triple Sec/Куантро/Курасао)","Кофейные","Ореховые","Сливочные","Фруктовые","Цветочные/Травяные"],
+  "Вермуты и аперитивы":["Вермут сухой","Вермут сладкий","Bianco/Extra-Dry","Биттер-аперитив (красный)","Амер"],
+  "Укреплённые вина":["Херес (общ.)","Портвейн (общ.)","Мадера"],
+  "Азиатские дистилляты":[
+    "Байцзю — соусный аромат","Байцзю — сильный аромат","Байцзю — лёгкий аромат","Байцзю — рисовый аромат",
+    "Сётю — имо (батат)","Сётю — комэ (рис)","Сётю — муги (ячмень)",
+    "Ауамори — классический","Ауамори — кусу (выдержанный)",
+    "Соджу — классический","Соджу — ароматизированный",
+    "Арак — Батавия","Арак — кокосовый (Шри-Ланка)",
+    "Фени — кокос","Фени — кешью",
+    "Ламбаног","Лао-Лао"
+  ]
 };
-var SUBCATS = {
-  "vodka":["Классическая","Вкусовая"],
-  "whisky":["Бурбон","Скотч","Ирландский","Японский","Бленд"],
-  "gin":["Сухой","Вкусовой"],
-  "tequila":["Blanco","Reposado","Anejo"],
-  "rum":["Светлый","Тёмный","Spiced"],
-  "liqueur":["Цитрусовый","Травяной","Сливочный","Кофейный","Фруктовый"],
-  "bitters":["Ароматический","Апельсиновый","Прочее"],
-  "amaro":["Аперитив","Дижестив"],
-  "mezcal":["Joven","Reposado","Anejo"],
-  "asian":["Саке","Соджу","Байцзю","Сёчу"],
-  "red_wine":["Сухое","Полусухое","Полусладкое"],
-  "white_wine":["Сухое","Полусухое","Полусладкое"],
-  "sparkling":["Brut","Extra Dry","Demi-sec"],
-  "other":["Без категории"]
+// быстрые чипы:
+var FEATURED_CATS = ["Водка","Виски","Джин и семейство","Ром","Текила","Мескаль и агавовые","Ликёры (сладкие)","Амаро/горькие ликёры","Вермуты и аперитивы","Азиатские дистилляты"];
+var POP_SUB = {
+  "Водка":["Классическая","Ароматизированная"],
+  "Виски":["Бурбон","Шотландский односолодовый","Ирландский","Японский"],
+  "Джин и семейство":["Лондонский сухой","Олд Том","Дженевер/Йеневер"],
+  "Ром":["Ямайский","Агриколь","Тёмный","Лёгкий (кубинский)"],
+  "Текила":["Бланко","Репосадо","Аньехо"],
+  "Мескаль и агавовые":["Мескаль (односортовой)","Сотоль"],
+  "Ликёры (сладкие)":["Цитрусовые (Triple Sec/Куантро/Курасао)","Кофейные","Сливочные"],
+  "Амаро/горькие ликёры":["Фернет","Итальянские амаро (общ.)"],
+  "Вермуты и аперитивы":["Вермут сухой","Вермут сладкий","Биттер-аперитив (красный)"],
+  "Азиатские дистилляты":["Байцзю — сильный аромат","Сётю — имо (батат)","Соджу — классический"]
 };
+
 var DEFAULT_DB = [
-  {"id":"olmeca-750","name":"Olmeca Blanco 750","category":"tequila","subcat":"Blanco","cap_ml":750,"abv_pct":40,"tare_g":600},
-  {"id":"absolut-700","name":"Absolut Vodka 700","category":"vodka","subcat":"Классическая","cap_ml":700,"abv_pct":40,"tare_g":420},
-  {"id":"jack-700","name":"Jack Daniel’s 700","category":"whisky","subcat":"Бурбон","cap_ml":700,"abv_pct":40,"tare_g":500}
+  {id:"absolut-700",name:"Absolut Vodka 700",category:"Водка",subcat:"Классическая",cap_ml:700,abv_pct:40,tare_g:420},
+  {id:"jack-700",name:"Jack Daniel’s 700",category:"Виски",subcat:"Теннессийский",cap_ml:700,abv_pct:40,tare_g:500},
+  {id:"olmeca-750",name:"Olmeca Blanco 750",category:"Текила",subcat:"Бланко",cap_ml:750,abv_pct:40,tare_g:600}
 ];
 
-var mem = {}; var lsOK=false;
-try{ var k='__bb__'+Math.random(); localStorage.setItem(k,'1'); localStorage.removeItem(k); lsOK=true; }catch(e){ lsOK=false; }
-function getStore(key, def){ try{ if(lsOK){ var v=localStorage.getItem(key); return v?JSON.parse(v):def; } }catch(e){} return (mem[key]!==undefined)?mem[key]:def; }
-function setStore(key, val){ try{ if(lsOK){ localStorage.setItem(key, JSON.stringify(val)); return; } }catch(e){} mem[key]=val; }
+// storage
+var mem={},lsOK=false;try{var k='__bb__'+Math.random();localStorage.setItem(k,'1');localStorage.removeItem(k);lsOK=true;}catch(e){lsOK=false;}
+function getStore(key,def){try{if(lsOK){var v=localStorage.getItem(key);return v?JSON.parse(v):def}}catch(e){}return (mem[key]!==undefined)?mem[key]:def}
+function setStore(key,val){try{if(lsOK){localStorage.setItem(key,JSON.stringify(val));return}}catch(e){}mem[key]=val}
 
-var DB = getStore('bb_db_v310', DEFAULT_DB.slice ? DEFAULT_DB.slice() : DEFAULT_DB);
-function saveDB(){ setStore('bb_db_v310', DB); }
-function DBMAP(){ var o={}; for(var i=0;i<DB.length;i++){ o[DB[i].id]=DB[i]; } return o; }
-function catsFromDB(){ var s={}, out=[]; for(var i=0;i<DB.length;i++){ s[DB[i].category]=true; } for(var k in CAT_LABELS){ if(s[k]) out.push(k); } if(out.length===0){ out=['vodka']; } return out; }
-function subcatsFor(c){ return SUBCATS[c]||[]; }
+// физика
+function rhoBase(abv){abv=Math.max(0,Math.min(96,Number(abv)||0));var a0={abv:0,rho:1.0},a1={abv:40,rho:0.948},a2={abv:96,rho:0.805};if(abv<=a1.abv){var t=abv/(a1.abv-a0.abv);return a0.rho+t*(a1.rho-a0.rho)}var t2=(abv-a1.abv)/(a2.abv-a1.abv);return a1.rho+t2*(a2.rho-a1.rho)}
+function vMass(net,abv){return net>0?net/rhoBase(abv):0}
+function vGeom(cap,h,ht){return(!cap||!h||!ht||h<=0||ht<=0)?0:cap*Math.max(0,Math.min(1,h/ht))}
 
-/*** ФИЗИКА ***/
-function rhoBase(abv){
-  abv = Math.max(0, Math.min(96, Number(abv)||0));
-  var a0={abv:0,rho:1.0}, a1={abv:40,rho:0.948}, a2={abv:96,rho:0.805};
-  if (abv <= a1.abv) { var t=abv/(a1.abv-a0.abv); return a0.rho + t*(a1.rho-a0.rho); }
-  var t2=(abv-a1.abv)/(a2.abv-a1.abv); return a1.rho + t2*(a2.rho-a1.rho);
-}
-function vMass(net,abv){ return net>0 ? net / rhoBase(abv) : 0; }
-function vGeom(cap,h,ht){ return (!cap||!h||!ht||h<=0||ht<=0)?0: cap * Math.max(0, Math.min(1, h/ht)); }
+// БД
+var DB=getStore('bb_db_v311',DEFAULT_DB.slice());
+function saveDB(){setStore('bb_db_v311',DB)}
+function DBMAP(){var o={};for(var i=0;i<DB.length;i++){o[DB[i].id]=DB[i]}return o}
 
-/*** UI HELPERS ***/
-function setOptions(el, options, withAll){
-  var html=withAll?'<option value="">Все</option>':''; for(var i=0;i<options.length;i++){ html+='<option>'+options[i]+'</option>'; } el.innerHTML=html;
+// UI заполнение
+function setOptions(el,arr,withAll){var html=withAll?'<option value="">Все</option>':'';for(var i=0;i<arr.length;i++){html+='<option>'+arr[i]+'</option>'}el.innerHTML=html}
+function fillCats(){ setOptions($('cat-select'), Object.keys(CATEGORIES), false) }
+function fillSubs(){ setOptions($('subcat-select'), CATEGORIES[$('cat-select').value]||[], true) }
+function renderCatChips(){
+  var box=$('cat-chips'), html='';
+  FEATURED_CATS.forEach(k=>html+='<div class="chip" data-cat="'+k+'">'+k+'</div>');
+  box.innerHTML=html;
+  Array.from(box.children).forEach(ch=>{
+    ch.addEventListener('click', ()=>{ $('cat-select').value=ch.dataset.cat; fillSubs(); renderSubcatChips(); fillBottles(); saveCalcState(); highlightChips() })
+  });
+  highlightChips();
 }
-function fillCats(){
-  var cats=catsFromDB(), html=''; for(var i=0;i<cats.length;i++){ var c=cats[i]; html+='<option value="'+c+'">'+CAT_LABELS[c]+'</option>'; } $('cat-select').innerHTML=html;
+function renderSubcatChips(){
+  var box=$('subcat-chips'), cat=$('cat-select').value, subs=POP_SUB[cat]||[], html='';
+  subs.forEach(s=>html+='<div class="chip" data-sub="'+s+'">'+s+'</div>');
+  box.innerHTML=html;
+  Array.from(box.children).forEach(ch=>{
+    ch.addEventListener('click', ()=>{ $('subcat-select').value=ch.dataset.sub; fillBottles(); saveCalcState(); highlightChips() })
+  });
+  highlightChips();
 }
-function fillSubs(){ setOptions($('subcat-select'), subcatsFor($('cat-select').value), true); }
-function fillBottles(cat,sub,q){
-  var list=[]; for(var i=0;i<DB.length;i++){ var x=DB[i]; if(cat && x.category!==cat) continue; if(sub && x.subcat!==sub) continue; list.push(x); }
-  if(q){ var st=String(q).toLowerCase(); var l2=[]; for(var j=0;j<list.length;j++){ if(list[j].name.toLowerCase().indexOf(st)>-1) l2.push(list[j]); } list=l2; }
-  list.sort(function(a,b){ var d=(CAT_LABELS[a.category]||a.category).localeCompare(CAT_LABELS[b.category]||b.category); if(d) return d; d=(a.subcat||'').localeCompare(b.subcat||''); if(d) return d; return a.name.localeCompare(b.name); });
-  var html=''; for(var k=0;k<list.length;k++){ html+='<option value="'+list[k].id+'">'+list[k].name+'</option>'; }
-  $('bottle-select').innerHTML=html; if(list.length) loadPassport(list[0].id);
+function highlightChips(){
+  Array.from($('cat-chips').children).forEach(c=>c.classList.toggle('active',c.dataset.cat===$('cat-select').value));
+  Array.from($('subcat-chips').children).forEach(c=>c.classList.toggle('active',c.dataset.sub===$('subcat-select').value));
+}
+function fillBottles(){
+  var cat=$('cat-select').value, sub=$('subcat-select').value, q=String($('search-bottle').value||'').toLowerCase();
+  var list=DB.filter(b=>(!cat||b.category===cat)&&(!sub||sub==='Все'||b.subcat===sub)&&(!q||b.name.toLowerCase().includes(q)));
+  list.sort((a,b)=>a.name.localeCompare(b.name));
+  $('bottle-select').innerHTML=list.map(b=>'<option value="'+b.id+'">'+b.name+'</option>').join('');
+  if(list.length){loadPassport(list[0].id)} else {$('passport').innerHTML=''; $('cap').value=''; $('abv').value=''; $('tare').value='';}
 }
 function loadPassport(id){
   var b=DBMAP()[id]; if(!b) return;
   $('bottle-select').value=b.id; $('cap').value=b.cap_ml; $('abv').value=b.abv_pct; $('tare').value=b.tare_g;
-  $('passport').innerHTML='<span class="badge">'+(CAT_LABELS[b.category]||b.category)+(b.subcat?(' → '+b.subcat):'')+'</span>'+
-                          '<span class="badge">'+b.cap_ml+' мл</span>'+
-                          '<span class="badge">'+b.abv_pct+'%</span>'+
-                          '<span class="badge">'+b.tare_g+' г</span>';
+  $('passport').innerHTML='<span class="badge">'+b.category+' → '+b.subcat+'</span><span class="badge">'+b.cap_ml+' мл</span><span class="badge">'+b.abv_pct+'%</span><span class="badge">'+b.tare_g+' г</span>';
   saveCalcState();
 }
 
-/*** ВАЛИДАЦИЯ/СОХРАНЕНИЕ ***/
-function isNum(n){ return n!=='' && !isNaN(n); }
+// валидатор / состояние
+function isNum(n){return n!==''&&!isNaN(n)}
 function validateCalc(){
-  var ok=true, gross=$('gross'), hTot=$('hTot'), hLiq=$('hLiq'), vals=[gross,hTot,hLiq];
-  for(var i=0;i<vals.length;i++){ vals[i].classList.remove('invalid'); }
-  if(!isNum(gross.value)){ gross.classList.add('invalid'); ok=false; }
-  if(!isNum(hTot.value) || Number(hTot.value)<=0){ hTot.classList.add('invalid'); ok=false; }
-  if(!isNum(hLiq.value) || Number(hLiq.value)<0){ hLiq.classList.add('invalid'); ok=false; }
-  if(isNum(hLiq.value) && isNum(hTot.value) && Number(hLiq.value)>Number(hTot.value)){ hLiq.classList.add('invalid'); ok=false; $('note').textContent='Уровень не может быть выше высоты.'; } else { if($('note').textContent.indexOf('Уровень')===0) $('note').textContent=''; }
-  $('calc').disabled=!ok; return ok;
+  var ok=true, gross=$('gross'), hTot=$('hTot'), hLiq=$('hLiq'), arr=[gross,hTot,hLiq];
+  arr.forEach(i=>i.classList.remove('invalid'));
+  if(!isNum(gross.value)){gross.classList.add('invalid');ok=false}
+  if(!isNum(hTot.value)||Number(hTot.value)<=0){hTot.classList.add('invalid');ok=false}
+  if(!isNum(hLiq.value)||Number(hLiq.value)<0){hLiq.classList.add('invalid');ok=false}
+  if(isNum(hLiq.value)&&isNum(hTot.value)&&Number(hLiq.value)>Number(hTot.value)){hLiq.classList.add('invalid');ok=false;$('note').textContent='Уровень не может быть выше высоты.'}else{ if($('note').textContent.startsWith('Уровень')) $('note').textContent='' }
+  $('calc').disabled=!ok; return ok
 }
 function saveCalcState(){
-  var st={cat:$('cat-select').value, sub:$('subcat-select').value, q:$('search-bottle').value, id:$('bottle-select').value,
-          gross:$('gross').value, hTot:$('hTot').value, hLiq:$('hLiq').value};
-  setStore('bb_calc_v310', st);
+  setStore('bb_calc_v311',{cat:$('cat-select').value,sub:$('subcat-select').value,q:$('search-bottle').value,id:$('bottle-select').value,gross:$('gross').value,hTot:$('hTot').value,hLiq:$('hLiq').value})
 }
 function loadCalcState(){
-  var st=getStore('bb_calc_v310', null); if(!st) return;
-  $('cat-select').value=st.cat||$('cat-select').value; fillSubs(); if(st.sub){ $('subcat-select').value=st.sub; }
-  fillBottles($('cat-select').value, $('subcat-select').value, st.q||''); $('search-bottle').value=st.q||'';
-  if(st.id && DBMAP()[st.id]){ $('bottle-select').value=st.id; loadPassport(st.id); }
+  var st=getStore('bb_calc_v311',null); if(!st) return;
+  $('cat-select').value=st.cat||$('cat-select').value; fillSubs(); $('subcat-select').value=st.sub||''; renderCatChips(); renderSubcatChips();
+  $('search-bottle').value=st.q||''; fillBottles(); if(st.id&&DBMAP()[st.id]){ $('bottle-select').value=st.id; loadPassport(st.id) }
   $('gross').value=st.gross||''; $('hTot').value=st.hTot||''; $('hLiq').value=st.hLiq||''; validateCalc();
 }
 
-/*** РАСЧЁТ ***/
+// расчёт
 function calculate(){
-  if(!validateCalc()) return;
-  var b=DBMAP()[$('bottle-select').value]; if(!b){ $('note').textContent='Выберите бутылку'; return; }
+  if(!validateCalc())return;
+  var b=DBMAP()[$('bottle-select').value]; if(!b){$('note').textContent='Выберите бутылку';return}
   var gross=Number($('gross').value), hTot=Number($('hTot').value), hLiq=Number($('hLiq').value);
-  var net=Math.max(0,gross-b.tare_g), vM=vMass(net,b.abv_pct), vG=vGeom(b.cap_ml,hLiq,hTot);
-  var V=(vM>0&&vG>0)?(vM+vG)/2:((vM>0)?vM:vG); V=Math.max(0,Math.min(b.cap_ml,V));
-  var pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0;
+  var net=Math.max(0,gross-b.tare_g), vM=vMass(net,b.abv_pct), vG=vGeom(b.cap_ml,hLiq,hTot),
+      V=(vM>0&&vG>0)?(vM+vG)/2:(vM>0?vM:vG);
+  V=Math.max(0,Math.min(b.cap_ml,V)); var pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0;
   $('res').innerHTML='<div class="big">≈ '+fmt(V)+' мл</div><div class="kv"><span class="badge">по массе: '+fmt(vM)+' мл</span><span class="badge">по высоте: '+fmt(vG)+' мл</span><span class="badge">заполнено ≈ '+fmt(pct)+'%</span></div>';
 }
 
-/*** БАЗА — список ***/
+// база
 function renderDB(){
-  var list=DB.slice(); list.sort(function(a,b){ var d=(CAT_LABELS[a.category]||a.category).localeCompare(CAT_LABELS[b.category]||b.category); if(d) return d; d=(a.subcat||'').localeCompare(b.subcat||''); if(d) return d; return a.name.localeCompare(b.name); });
-  var box=$('db-list'), html=''; for(var x=0;x<list.length;x++){
-    var b=list[x];
-    html+='<div style="padding:10px;border:1px solid #1f2230;border-radius:12px">'+
-            '<div style="font-weight:700">'+b.name+'</div>'+
-            '<div class="kv">'+
-              '<span class="badge">'+(CAT_LABELS[b.category]||b.category)+(b.subcat?(' → '+b.subcat):'')+'</span>'+
-              '<span class="badge">'+b.cap_ml+' мл</span>'+
-              '<span class="badge">'+b.abv_pct+'%</span>'+
-              '<span class="badge">'+b.tare_g+' г</span>'+
-            '</div>'+
-          '</div>';
-  }
-  box.innerHTML=html;
+  var list=DB.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  var html=list.map(b=>(
+    '<div style="padding:10px;border:1px solid #1f2230;border-radius:12px">'+
+    '<div style="font-weight:700">'+b.name+'</div>'+
+    '<div class="kv"><span class="badge">'+b.category+' → '+b.subcat+'</span><span class="badge">'+b.cap_ml+' мл</span><span class="badge">'+b.abv_pct+'%</span><span class="badge">'+b.tare_g+' г</span></div>'+
+    '</div>'
+  )).join('');
+  $('db-list').innerHTML=html;
 }
-
-/*** МОДАЛ — добавление ***/
-function catsOptionsHtml(){ var s=''; for(var key in CAT_LABELS){ s+='<option value="'+key+'">'+CAT_LABELS[key]+'</option>'; } return s; }
-function subsOptionsHtml(cat){ var subs=subcatsFor(cat), s=''; for(var i=0;i<subs.length;i++){ s+='<option>'+subs[i]+'</option>'; } return s; }
-function openModal(){ $('m-cat').innerHTML=catsOptionsHtml(); $('m-sub').innerHTML=subsOptionsHtml($('m-cat').value); $('m-name').value=''; $('m-cap').value=''; $('m-abv').value=''; $('m-tare').value=''; $('m-msg').textContent=''; $('modal').style.display='flex'; }
-function closeModal(){ $('modal').style.display='none'; }
+function catsOptionsHtml(){return Object.keys(CATEGORIES).map(c=>'<option>'+c+'</option>').join('')}
+function subsOptionsHtml(cat){return (CATEGORIES[cat]||[]).map(s=>'<option>'+s+'</option>').join('')}
+function openModal(){$('m-cat').innerHTML=catsOptionsHtml();$('m-sub').innerHTML=subsOptionsHtml($('m-cat').value);$('m-name').value='';$('m-cap').value='';$('m-abv').value='';$('m-tare').value='';$('m-msg').textContent='';$('modal').classList.remove('hidden')}
+function closeModal(){$('modal').classList.add('hidden')}
 function addBottle(){
   var cat=$('m-cat').value, sub=$('m-sub').value, name=$('m-name').value, cap=Number($('m-cap').value), abv=Number($('m-abv').value), tare=Number($('m-tare').value);
-  if(!name||!cap||!abv||!tare){ $('m-msg').textContent='Заполните все поля'; return; }
-  var key=uniqKey(name,cat,sub);
-  for(var i=0;i<DB.length;i++){ var b=DB[i]; if(uniqKey(b.name,b.category,b.subcat)===key){ $('m-msg').textContent='Такая бутылка уже существует'; return; } }
-  var id=slug(name); DB.push({id:id,name:name,category:cat,subcat:sub,cap_ml:cap,abv_pct:abv,tare_g:tare}); saveDB();
-  fillCats(); fillSubs(); fillBottles($('cat-select').value, $('subcat-select').value, $('search-bottle').value); renderDB();
-  $('m-msg').textContent='Сохранено'; setTimeout(closeModal, 350);
+  if(!name||!cap||!abv||!tare){$('m-msg').textContent='Заполните все поля';return}
+  var key=uniqKey(name,cat,sub); for(var i=0;i<DB.length;i++){if(uniqKey(DB[i].name,DB[i].category,DB[i].subcat)===key){$('m-msg').textContent='Такая бутылка уже существует';return}}
+  DB.push({id:slug(name),name:name,category:cat,subcat:sub,cap_ml:cap,abv_pct:abv,tare_g:tare}); saveDB(); fillBottles(); renderDB(); $('m-msg').textContent='Сохранено'; setTimeout(closeModal,350)
 }
+function resetDB(){ if(!confirm('Сбросить базу к встроенной?')) return; DB=DEFAULT_DB.slice(); saveDB(); fillBottles(); renderDB() }
 
-/*** Экспорт / Импорт ***/
-function exportJSON(filename, obj){
-  var data = '\ufeff' + JSON.stringify(obj, null, 2);
-  var blob = new Blob([data], {type:'application/json;charset=utf-8'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 200);
-}
-function toCSV(rows, delim){
-  function esc(s){ s = String(s).replace(/"/g,'""'); if(new RegExp('["'+delim+'\\n\\r]').test(s)) return '"'+s+'"'; return s; }
-  var out=[], BOM='\ufeff'; for(var i=0;i<rows.length;i++){ var r=rows[i], line=[]; for(var j=0;j<r.length;j++){ line.push(esc(r[j])); } out.push(line.join(delim)); }
-  return BOM + out.join('\r\n') + '\r\n';
-}
-function exportCSV(filename, rows, delim){
-  var csv=toCSV(rows, delim||','); var blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); var url=URL.createObjectURL(blob);
-  var a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 200);
-}
-function detectDelim(line){ var c1=(line.match(/,/g)||[]).length, c2=(line.match(/;/g)||[]).length; return c2>c1?';':','; }
+// CSV
+function escCSV(s,delim){s=String(s).replace(/"/g,'""');return /["\n\r,;]/.test(s)?('"'+s+'"'):s}
+function toCSV(rows,delim){var BOM='\ufeff';return BOM+rows.map(r=>r.map(x=>escCSV(x,delim)).join(delim)).join('\r\n')+'\r\n'}
+function exportCSV(filename,rows,delim){var blob=new Blob([toCSV(rows,delim||',')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},200)}
+function detectDelim(line){var c1=(line.match(/,/g)||[]).length,c2=(line.match(/;/g)||[]).length;return c2>c1?';':','}
 function parseCSV(text){
-  // Универсальный парсер с поддержкой кавычек и двойных кавычек внутри полей
-  var rows=[], row=[], field='', inQ=false, delim=detectDelim((text.split(/\r?\n/)[0]||'')); 
-  for (var i=0;i<text.length;i++){
-    var ch=text[i];
-    if(inQ){
-      if(ch=='"'){
-        if(text[i+1]=='"'){ field+='"'; i++; }
-        else { inQ=false; }
-      } else { field+=ch; }
-    } else {
-      if(ch=='"'){ inQ=true; }
-      else if(ch===delim){ row.push(field); field=''; }
-      else if(ch=='\n'){
-        row.push(field); rows.push(row); row=[]; field='';
-      } else if(ch=='\r'){ /* skip */ }
-      else { field+=ch; }
-    }
+  var rows=[],row=[],field='',inQ=false,delim=detectDelim((text.split(/\r?\n/)[0]||'')); 
+  for(var i=0;i<text.length;i++){var ch=text[i];
+    if(inQ){ if(ch=='"'){ if(text[i+1]=='"'){field+='"';i++} else inQ=false } else field+=ch }
+    else{ if(ch=='"') inQ=true; else if(ch===delim){row.push(field);field=''} else if(ch=='\n'){row.push(field);rows.push(row);row=[];field=''} else if(ch!='\r'){field+=ch} }
   }
-  if(field!=='' || row.length){ row.push(field); rows.push(row); }
-  // Удаляем пустые строки:
-  return rows.filter(function(r){ return r.join('').trim()!==''; });
-}
-function importJSONData(data){
-  if(Object.prototype.toString.call(data)!=="[object Array]") return {added:0,dup:0};
-  var added=0, dup=0;
-  for(var i=0;i<data.length;i++){
-    var b=data[i]; if(!b || !b.name) continue;
-    var cat=b.category||'other', sub=b.subcat||'';
-    var key=uniqKey(b.name,cat,sub), exists=false;
-    for(var j=0;j<DB.length;j++){ if(uniqKey(DB[j].name,DB[j].category,DB[j].subcat)===key){ exists=true; break; } }
-    if(exists){ dup++; continue; }
-    DB.push({id:slug(b.name), name:b.name, category:cat, subcat:sub, cap_ml:Number(b.cap_ml)||0, abv_pct:Number(b.abv_pct)||0, tare_g:Number(b.tare_g)||0});
-    added++;
-  }
-  saveDB(); renderDB(); fillCats(); fillSubs(); fillBottles($('cat-select').value, $('subcat-select').value, $('search-bottle').value);
-  return {added:added, dup:dup};
-}
-function importJSONFile(file){
-  var fr=new FileReader(); fr.onload=function(){ try{
-    var data=JSON.parse(fr.result||'[]'); var r=importJSONData(data); $('db-msg').textContent='Импорт JSON: добавлено '+r.added+', дубликатов '+r.dup;
-  }catch(e){ $('db-msg').textContent='Ошибка JSON: '+e.message; } }; fr.readAsText(file, 'utf-8');
+  if(field!==''||row.length){row.push(field);rows.push(row)}
+  return rows.filter(r=>r.join('').trim()!=='')
 }
 function importCSVFile(file){
   var fr=new FileReader(); fr.onload=function(){
-    var rows=parseCSV(fr.result||''); if(!rows.length){ $('db-msg').textContent='CSV пуст'; return; }
-    var header=rows[0].map(function(s){ return String(s||'').trim().toLowerCase(); });
-    var idx={name:header.indexOf('name'), category:header.indexOf('category'), subcat:header.indexOf('subcat'), cap_ml:header.indexOf('cap_ml'), abv_pct:header.indexOf('abv_pct'), tare_g:header.indexOf('tare_g')};
+    var rows=parseCSV(fr.result||''); if(!rows.length){$('db-msg').textContent='CSV пуст';return}
+    var head=rows[0].map(s=>String(s||'').trim().toLowerCase());
+    var idx={name:head.indexOf('name'),category:head.indexOf('category'),subcat:head.indexOf('subcat'),cap_ml:head.indexOf('cap_ml'),abv_pct:head.indexOf('abv_pct'),tare_g:head.indexOf('tare_g')};
     var data=[];
-    for(var r=1;r<rows.length;r++){
-      var row=rows[r]; var name=row[idx.name]; if(!name){ continue; }
-      data.push({name:name, category:row[idx.category]||'other', subcat:row[idx.subcat]||'', cap_ml:row[idx.cap_ml]||0, abv_pct:row[idx.abv_pct]||0, tare_g:row[idx.tare_g]||0});
+    for(var r=1;r<rows.length;r++){var rw=rows[r]; var name=rw[idx.name]; if(!name) continue;
+      data.push({name:name,category:rw[idx.category]||'Другое',subcat:rw[idx.subcat]||'',cap_ml:Number(rw[idx.cap_ml]||0),abv_pct:Number(rw[idx.abv_pct]||0),tare_g:Number(rw[idx.tare_g]||0)})
     }
-    var res=importJSONData(data); $('db-msg').textContent='Импорт CSV: добавлено '+res.added+', дубликатов '+res.dup;
-  }; fr.readAsText(file, 'utf-8');
+    var added=0,dup=0;
+    data.forEach(b=>{var key=uniqKey(b.name,b.category,b.subcat),exists=DB.some(x=>uniqKey(x.name,x.category,x.subcat)===key); if(exists){dup++}else{DB.push({id:slug(b.name),...b});added++}});
+    saveDB(); fillBottles(); renderDB(); $('db-msg').textContent='Импорт CSV: добавлено '+added+', дубликатов '+dup;
+  }; fr.readAsText(file,'utf-8')
 }
 
-function resetDB(){
-  if(!confirm('Сбросить базу к встроенной? Действие нельзя отменить.')) return;
-  DB = DEFAULT_DB.slice ? DEFAULT_DB.slice() : DEFAULT_DB; saveDB();
-  fillCats(); fillSubs(); fillBottles($('cat-select').value, $('subcat-select').value, $('search-bottle').value); renderDB();
-}
-
-/*** СЕССИЯ: inline-редактирование ***/
-var SESS = getStore('bb_sess_v310', {id: null, rows: []});
-function saveSESS(){ setStore('bb_sess_v310', SESS); }
-function sessNew(){ SESS={id:('S'+Math.floor(Date.now()/1000)), rows:[]}; saveSESS(); renderSess(); }
-function sessBottleList(fillQuery){
-  var list=DB.slice(); if(fillQuery){ var st=String(fillQuery).toLowerCase(); list=list.filter(function(x){ return x.name.toLowerCase().indexOf(st)>-1; }); }
-  list.sort(function(a,b){ return a.name.localeCompare(b.name); });
-  var html=''; for(var i=0;i<list.length;i++){ html+='<option value="'+list[i].id+'">'+list[i].name+'</option>'; } $('sess-bottle').innerHTML=html;
-}
-function sessAddRow(){
-  var id=$('sess-bottle').value; var b=DBMAP()[id]; if(!b) return;
-  var row={id:id,name:b.name,gross:0,hTot:0,hLiq:0,vol:0,pct:0}; SESS.rows.push(row); saveSESS(); renderSess();
-}
-function sessDel(idx){ SESS.rows.splice(idx,1); saveSESS(); renderSess(); }
-function sessRecalc(i){
-  var r=SESS.rows[i], b=DBMAP()[r.id]; if(!b) return;
-  var net=Math.max(0,Number(r.gross||0)-b.tare_g);
-  var vm=vMass(net,b.abv_pct), vg=vGeom(b.cap_ml, Number(r.hLiq||0), Number(r.hTot||0));
-  var V=(vm>0&&vg>0)?(vm+vg)/2:((vm>0)?vm:vg); V=Math.max(0,Math.min(b.cap_ml,V));
-  r.vol=V; r.pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0;
-}
+// сессия
+var SESS=getStore('bb_sess_v311',{id:null,rows:[]}); function saveSESS(){setStore('bb_sess_v311',SESS)}
+function sessNew(){SESS={id:('S'+Math.floor(Date.now()/1000)),rows:[]};saveSESS();renderSess()}
+function sessBottleList(q){var list=DB.slice(); if(q){var st=String(q).toLowerCase(); list=list.filter(x=>x.name.toLowerCase().includes(st))} list.sort((a,b)=>a.name.localeCompare(b.name)); $('sess-bottle').innerHTML=list.map(x=>'<option value="'+x.id+'">'+x.name+'</option>').join('')}
+function sessAddRow(){var id=$('sess-bottle').value,b=DBMAP()[id]; if(!b) return; SESS.rows.push({id:id,name:b.name,gross:0,hTot:0,hLiq:0,vol:0,pct:0}); saveSESS(); renderSess()}
+function sessDel(i){SESS.rows.splice(i,1);saveSESS();renderSess()}
+function sessRecalc(i){var r=SESS.rows[i],b=DBMAP()[r.id]; if(!b) return; var vm=vMass(Math.max(0,Number(r.gross||0)-b.tare_g),b.abv_pct), vg=vGeom(b.cap_ml,Number(r.hLiq||0),Number(r.hTot||0)); var V=(vm>0&&vg>0)?(vm+vg)/2:(vm>0?vm:vg); V=Math.max(0,Math.min(b.cap_ml,V)); r.vol=V; r.pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0}
 function renderSess(){
-  $('sess-info').textContent = SESS.id ? ('Сессия: '+SESS.id+' • позиций: '+SESS.rows.length) : 'Сессия не создана';
-  var tb=$('sess-table').querySelector('tbody'), html='';
-  for(var i=0;i<SESS.rows.length;i++){
-    var r=SESS.rows[i];
-    html+='<tr data-i="'+i+'">'+
-      '<td>'+(i+1)+'</td>'+
-      '<td><select class="r-bottle"></select></td>'+
-      '<td><input class="r-gross" type="number" inputmode="decimal" value="'+(r.gross||'')+'"></td>'+
-      '<td><input class="r-htot" type="number" inputmode="numeric" value="'+(r.hTot||'')+'"></td>'+
-      '<td><input class="r-hliq" type="number" inputmode="numeric" value="'+(r.hLiq||'')+'"></td>'+
-      '<td class="r-vol">'+fmt(r.vol||0)+'</td>'+
-      '<td class="r-pct">'+fmt(r.pct||0)+'</td>'+
-      '<td><span class="link" data-del="'+i+'">Удалить</span></td>'+
-    '</tr>';
+  $('sess-info').textContent=SESS.id?('Сессия: '+SESS.id+' • позиций: '+SESS.rows.length):'Сессия не создана';
+  var tb=$('sess-table').querySelector('tbody'); var html='';
+  for(var i=0;i<SESS.rows.length;i++){var r=SESS.rows[i];
+    html+='<tr data-i="'+i+'"><td>'+(i+1)+'</td><td><select class="r-bottle"></select></td>'+
+    '<td><input class="r-gross" type="number" inputmode="decimal" value="'+(r.gross||'')+'"></td>'+
+    '<td><input class="r-htot" type="number" inputmode="numeric" value="'+(r.hTot||'')+'"></td>'+
+    '<td><input class="r-hliq" type="number" inputmode="numeric" value="'+(r.hLiq||'')+'"></td>'+
+    '<td class="r-vol">'+fmt(r.vol||0)+'</td><td class="r-pct">'+fmt(r.pct||0)+'</td>'+
+    '<td><span class="link" data-del="'+i+'">Удалить</span></td></tr>'
   }
   tb.innerHTML=html;
-  var rows=tb.querySelectorAll('tr');
-  for(var j=0;j<rows.length;j++){
-    (function(row){
-      var i=parseInt(row.getAttribute('data-i'),10);
-      var sel=row.querySelector('.r-bottle'); var list=DB.slice(); list.sort(function(a,b){ return a.name.localeCompare(b.name); });
-      var html=''; for(var k=0;k<list.length;k++){ html+='<option value="'+list[k].id+'">'+list[k].name+'</option>'; } sel.innerHTML=html; sel.value=SESS.rows[i].id;
-      sel.addEventListener('change', function(){ SESS.rows[i].id=sel.value; SESS.rows[i].name=DBMAP()[sel.value].name; sessRecalc(i); saveSESS(); row.querySelector('.r-vol').textContent=fmt(SESS.rows[i].vol); row.querySelector('.r-pct').textContent=fmt(SESS.rows[i].pct); });
-      function bind(inp, key){ inp.addEventListener('input', function(){ SESS.rows[i][key]=inp.value; sessRecalc(i); saveSESS(); row.querySelector('.r-vol').textContent=fmt(SESS.rows[i].vol); row.querySelector('.r-pct').textContent=fmt(SESS.rows[i].pct); }); }
-      bind(row.querySelector('.r-gross'),'gross'); bind(row.querySelector('.r-htot'),'hTot'); bind(row.querySelector('.r-hliq'),'hLiq');
-      row.querySelector('[data-del]').addEventListener('click', function(){ sessDel(i); });
-    })(rows[j]);
-  }
+  var rows=tb.querySelectorAll('tr'); var list=DB.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  for(let j=0;j<rows.length;j++){(function(row){
+    var i=parseInt(row.getAttribute('data-i'),10), sel=row.querySelector('.r-bottle'); sel.innerHTML=list.map(x=>'<option value="'+x.id+'">'+x.name+'</option>').join(''); sel.value=SESS.rows[i].id;
+    sel.addEventListener('change',()=>{SESS.rows[i].id=sel.value; SESS.rows[i].name=DBMAP()[sel.value].name; sessRecalc(i); saveSESS(); row.querySelector('.r-vol').textContent=fmt(SESS.rows[i].vol); row.querySelector('.r-pct').textContent=fmt(SESS.rows[i].pct);});
+    function bind(inp,key){inp.addEventListener('input',()=>{SESS.rows[i][key]=inp.value; sessRecalc(i); saveSESS(); row.querySelector('.r-vol').textContent=fmt(SESS.rows[i].vol); row.querySelector('.r-pct').textContent=fmt(SESS.rows[i].pct);})}
+    bind(row.querySelector('.r-gross'),'gross'); bind(row.querySelector('.r-htot'),'hTot'); bind(row.querySelector('.r-hliq'),'hLiq');
+    row.querySelector('[data-del]').addEventListener('click',()=>sessDel(i));
+  })(rows[j])}
 }
 
-/*** ТАБЫ И ИНИЦ ***/
-function switchTab(key){
-  var ids=['calc','db','session']; for(var i=0;i<ids.length;i++){ var on=(ids[i]===key); var sec=$('tab-'+ids[i]); if(on){sec.className=sec.className.replace(' hidden','');} else if(sec.className.indexOf('hidden')===-1){sec.className+=' hidden';} }
-  var tabs=document.querySelectorAll('.tab'); for(var t=0;t<tabs.length;t++){ tabs[t].classList.toggle('active', tabs[t].getAttribute('data-tab')===key); }
-}
+// инициализация
 function init(){
-  fillCats(); fillSubs(); fillBottles($('cat-select').value||'', '', ''); if($('bottle-select').options.length) loadPassport($('bottle-select').value);
-  renderDB(); renderSess(); loadCalcState();
+  fillCats(); fillSubs(); renderCatChips(); renderSubcatChips();
+  fillBottles(); renderDB(); sessBottleList(''); renderSess(); loadCalcState();
 }
-try {
-  init();
-  $('cat-select').addEventListener('change', function(){ fillSubs(); fillBottles($('cat-select').value, $('subcat-select').value, $('search-bottle').value); saveCalcState(); });
-  $('subcat-select').addEventListener('change', function(){ fillBottles($('cat-select').value, $('subcat-select').value, $('search-bottle').value); saveCalcState(); });
-  $('search-bottle').addEventListener('input', function(){ fillBottles($('cat-select').value, $('subcat-select').value, $('search-bottle').value); saveCalcState(); });
-  $('bottle-select').addEventListener('change', function(e){ loadPassport(e.target.value); });
-  qsa('#gross,#hTot,#hLiq').forEach(function(el){ el.addEventListener('input', function(){ validateCalc(); saveCalcState(); }); });
-  $('calc').addEventListener('click', calculate);
-  $('btn-refresh').addEventListener('click', function(){ var url=location.pathname + '?v=' + VER.replace(/\./g,'') + '-' + Date.now(); location.replace(url); });
-  document.querySelector('[data-tab="calc"]').addEventListener('click', function(){ switchTab('calc'); });
-  document.querySelector('[data-tab="db"]').addEventListener('click', function(){ switchTab('db'); });
-  document.querySelector('[data-tab="session"]').addEventListener('click', function(){ switchTab('session'); });
-  $('btn-add-bottle').addEventListener('click', openModal);
-  $('btn-reset-db').addEventListener('click', resetDB);
-  $('db-add').addEventListener('click', openModal);
-  $('db-reset').addEventListener('click', resetDB);
-  $('db-export-json').addEventListener('click', function(){ exportJSON('barboss-db.json', DB); });
-  $('db-export-csv').addEventListener('click', function(){
-    var rows=[['id','name','category','subcat','cap_ml','abv_pct','tare_g']];
-    for(var i=0;i<DB.length;i++){ var b=DB[i]; rows.push([b.id,b.name,b.category,b.subcat,b.cap_ml,b.abv_pct,b.tare_g]); }
-    var delim=$('csv-delim').value||','; exportCSV('barboss-db.csv', rows, delim);
-  });
-  $('db-import-json').addEventListener('click', function(){ $('file-json').click(); });
-  $('db-import-csv').addEventListener('click', function(){ $('file-csv').click(); });
-  $('file-json').addEventListener('change', function(){ if(this.files&&this.files[0]) importJSONFile(this.files[0]); this.value=''; });
-  $('file-csv').addEventListener('change', function(){ if(this.files&&this.files[0]) importCSVFile(this.files[0]); this.value=''; });
-  $('m-cat').addEventListener('change', function(){ $('m-sub').innerHTML=subsOptionsHtml($('m-cat').value); });
-  $('m-save').addEventListener('click', addBottle);
-  $('m-cancel').addEventListener('click', closeModal);
-  // сессия
-  $('sess-new').addEventListener('click', sessNew);
-  $('sess-add-row').addEventListener('click', sessAddRow);
-  $('sess-export-json').addEventListener('click', function(){ exportJSON('barboss-session.json', SESS); });
-  $('sess-export-csv').addEventListener('click', function(){
-    var rows=[['#','name','gross_g','height_cm','level_cm','volume_ml','percent']];
-    for(var i=0;i<SESS.rows.length;i++){ var r=SESS.rows[i]; rows.push([i+1,r.name,r.gross,r.hTot,r.hLiq,fmt(r.vol),fmt(r.pct)]); }
-    exportCSV('barboss-session.csv', $('csv-delim').value||',', rows);
-  });
-  $('sess-search').addEventListener('input', function(){ sessBottleList($('sess-search').value); });
-} catch(e){
-  showErr('err','Ошибка запуска: '+(e&&e.message?e.message:String(e)));
-  showErr('err2','Подсказка: откройте сайт вне встроенного браузера мессенджера (Safari/Chrome).');
-}
+init();
+
+// события
+$('cat-select').addEventListener('change',()=>{fillSubs(); renderSubcatChips(); fillBottles(); saveCalcState(); highlightChips()});
+$('subcat-select').addEventListener('change',()=>{fillBottles(); saveCalcState(); highlightChips()});
+$('search-bottle').addEventListener('input',()=>{fillBottles(); saveCalcState()});
+$('bottle-select').addEventListener('change',e=>loadPassport(e.target.value));
+qsa('#gross,#hTot,#hLiq').forEach(el=>el.addEventListener('input',()=>{validateCalc(); saveCalcState()}));
+$('calc').addEventListener('click',calculate);
+$('btn-refresh').addEventListener('click',()=>{location.replace(location.pathname+'?v='+VER.replace(/\./g,'')+'-'+Date.now())});
+
+document.querySelector('[data-tab="calc"]').addEventListener('click',()=>switchTab('calc'));
+document.querySelector('[data-tab="db"]').addEventListener('click',()=>switchTab('db'));
+document.querySelector('[data-tab="session"]').addEventListener('click',()=>switchTab('session'));
+function switchTab(key){['calc','db','session'].forEach(id=>{var sec=$('tab-'+id); sec.classList.toggle('hidden',id!==key);}); qsa('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===key));}
+
+// модал
+$('btn-add-bottle').addEventListener('click',openModal); $('db-add').addEventListener('click',openModal);
+$('m-cat').addEventListener('change',()=>{$('m-sub').innerHTML=subsOptionsHtml($('m-cat').value)});
+$('m-save').addEventListener('click',addBottle); $('m-cancel').addEventListener('click',closeModal);
+
+// база
+$('db-reset').addEventListener('click',resetDB);
+$('db-export-csv').addEventListener('click',()=>{var rows=[['id','name','category','subcat','cap_ml','abv_pct','tare_g']]; DB.forEach(b=>rows.push([b.id,b.name,b.category,b.subcat,b.cap_ml,b.abv_pct,b.tare_g])); exportCSV('barboss-db.csv',rows,$('csv-delim').value||',')});
+$('db-import-csv').addEventListener('click',()=>$('file-csv').click());
+$('file-csv').addEventListener('change',function(){if(this.files&&this.files[0]) importCSVFile(this.files[0]); this.value=''});
+
+// сессия
+$('sess-new').addEventListener('click',sessNew);
+$('sess-add-row').addEventListener('click',sessAddRow);
+$('sess-export-csv').addEventListener('click',()=>{var rows=[['#','name','gross_g','height_cm','level_cm','volume_ml','percent']]; for(var i=0;i<SESS.rows.length;i++){var r=SESS.rows[i]; rows.push([i+1,r.name,r.gross,r.hTot,r.hLiq,fmt(r.vol),fmt(r.pct)])} exportCSV('barboss-session.csv',rows,$('csv-delim2').value||',')});
+$('sess-search').addEventListener('input',()=>sessBottleList($('sess-search').value));
+
 })();
 </script>
+</body>
+</html>
 </body>
 </html>
