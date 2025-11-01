@@ -1,9 +1,9 @@
-<!doctype html>
+<!doctype html><!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BAR BOSS — инвентаризация (v3.13.0)</title>
+<title>BAR BOSS — инвентаризация (v3.14.0)</title>
 <meta name="theme-color" content="#0e0f13">
 <style>
 html,body{height:100%}
@@ -70,7 +70,7 @@ summary::-webkit-details-marker{display:none}
 <!-- HEADER -->
 <div class="header">
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-    <h1>BAR BOSS • v3.13.0</h1>
+    <h1>BAR BOSS • v3.14.0</h1>
     <div class="tabs">
       <button class="tab active" data-tab="calc" type="button">Калькулятор</button>
       <button class="tab" data-tab="db" type="button">База</button>
@@ -135,6 +135,7 @@ summary::-webkit-details-marker{display:none}
     <div class="body">
       <div class="actions" style="gap:10px 12px;margin-bottom:8px;align-items:center">
         <button id="db-add" class="sec" type="button">Добавить бутылку</button>
+        <button id="db-sync" class="small warn" type="button">Синхронизация таксономии</button>
         <label class="muted">Разделитель CSV</label>
         <select id="csv-delim" class="small"><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select>
         <button id="db-export-csv" class="small" type="button">Экспорт CSV</button>
@@ -203,7 +204,7 @@ summary::-webkit-details-marker{display:none}
 <script>
 (function(){
 'use strict';
-var VER='3.13.0';
+var VER='3.14.0';
 function $(id){return document.getElementById(id)}
 function qsa(s){return document.querySelectorAll(s)}
 function fmt(n){return isFinite(n)?Math.round(n):0}
@@ -214,8 +215,7 @@ function getStore(key,def){try{if(lsOK){var v=localStorage.getItem(key);return v
 function setStore(key,val){try{if(lsOK){localStorage.setItem(key,JSON.stringify(val));return}}catch(e){}mem[key]=val}
 function delStore(key){try{if(lsOK){localStorage.removeItem(key)}}catch(e){}}
 
-/* Таксономия (рационализирована под барную инвентаризацию;
-   названия ориентированы на структуру из справочника и общую практику) */
+/* Таксономия */
 var CATEGORIES={
  "Водка":["Классическая","Пшеничная","Ржаная","Картофельная","Ароматизированная"],
  "Виски":[
@@ -242,7 +242,28 @@ var CATEGORIES={
  ]
 };
 
-// База по умолчанию (пример)
+/* Синонимы для нормализации (категории и подкатегории) */
+const SYN={
+  cat:{
+    "Джин":"Джин и семейство",
+    "Бренди (виноградный/фруктовый)":"Бренди",
+    "Агавовые напитки":"Агавовые",
+    "Азиатский алкоголь":"Азиатские дистилляты",
+    "Ром агриколь":"Ром"
+  },
+  sub:{
+    "London Dry":"Лондонский сухой","Old Tom":"Олд Том","Plymouth":"Плимутский","Plymouth Gin":"Плимутский",
+    "Genever":"Дженевер/Йеневер","Jenever":"Дженевер/Йеневер","Sloe":"Sloe gin","Sloe Gin":"Sloe gin",
+    "Blanco":"Текила blanco","Plata":"Текила blanco","Silver":"Текила blanco",
+    "Reposado":"Текила reposado","Anejo":"Текила añejo","Añejo":"Текила añejo",
+    "Extra Anejo":"Текила extra añejo","Extra Añejo":"Текила extra añejo",
+    "Joven":"Мескаль joven",
+    "Overproof":"Оверпруф","White":"Белый/лёгкий","Light/White":"Белый/лёгкий","Dark":"Тёмный","Spiced":"Пряный",
+    "Agricole Blanc":"Агриколь blanc","Agricole Vieux":"Агриколь vieux"
+  }
+};
+
+/* База по умолчанию (пример) */
 var DEFAULT_DB=[
   {id:"absolut-700",name:"Absolut Vodka 700",category:"Водка",subcat:"Классическая",cap_ml:700,abv_pct:40,tare_g:420},
   {id:"jack-700",name:"Jack Daniel’s 700",category:"Виски",subcat:"Теннессийский",cap_ml:700,abv_pct:40,tare_g:500},
@@ -254,7 +275,7 @@ function saveDB(){setStore('bb_db_v311',DB)}
 function DBMAP(){var o={};for(var i=0;i<DB.length;i++){o[DB[i].id]=DB[i]}return o}
 function setOptions(el,arr,withAll){var h=withAll?'<option value="">Все</option>':'';for(var i=0;i<arr.length;i++)h+='<option>'+arr[i]+'</option>';el.innerHTML=h}
 
-/* Физика */
+/* Плотности/формулы */
 function rhoBase(abv){abv=Math.max(0,Math.min(96,Number(abv)||0));var a0={abv:0,rho:1.0},a1={abv:40,rho:0.948},a2={abv:96,rho:0.805};if(abv<=a1.abv){var t=abv/(a1.abv-a0.abv);return a0.rho+t*(a1.rho-a0.rho)}var t2=(abv-a1.abv)/(a2.abv-a1.abv);return a1.rho+t2*(a2.rho-a1.rho)}
 function vMass(net,abv){return net>0?net/rhoBase(abv):0}
 function vGeom(cap,h,ht){return(!cap||!h||!ht||h<=0||ht<=0)?0:cap*Math.max(0,Math.min(1,h/ht))}
@@ -292,7 +313,7 @@ function loadCalcState(){
   $('gross').value=st.gross||''; $('hTot').value=st.hTot||''; $('hLiq').value=st.hLiq||''; validateCalc();
 }
 
-/* Сессии и профили */
+/* Сессии/профили */
 var CLIENT=getStore('bb_client_id',null); if(!CLIENT){CLIENT='U'+Math.floor(Math.random()*1e9)+'-'+Date.now().toString(36); setStore('bb_client_id',CLIENT)}
 function sessKeyFor(profileId){return 'bb_sess_v311_'+CLIENT+'__'+profileId}
 var PROFILES=getStore('bb_profiles',[{id:'p1',name:'Профиль 1'}]);
@@ -335,7 +356,7 @@ function renderSess(){
   })(rows[j])}
 }
 
-/* Экспорт / импорт */
+/* CSV */
 function escCSV(s){s=String(s).replace(/"/g,'""');return /["\n\r,;]/.test(s)?('"'+s+'"'):s}
 function toCSV(rows,delim){var BOM='\ufeff';return BOM+rows.map(r=>r.map(x=>escCSV(x)).join(delim)).join('\r\n')+'\r\n'}
 function exportCSV(filename,rows,delim){var blob=new Blob([toCSV(rows,delim||',')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},200)}
@@ -363,24 +384,62 @@ function importCSVFile(file){
     for(var r=1;r<rows.length;r++){
       var rw=rows[r]; var name=rw[idx.name]; if(!name) continue;
       var cat=rw[idx.category]||'Другое', sub=rw[idx.subcat]||'', cap=Number(rw[idx.cap_ml]||0), abv=Number(rw[idx.abv_pct]||0), tare=Number(rw[idx.tare_g]||0);
+      // нормализация синонимов
+      if(SYN.cat[cat]) cat=SYN.cat[cat];
+      if(SYN.sub[sub]) sub=SYN.sub[sub];
       var key=uniqKey(name,cat,sub), exists=DB.some(x=>uniqKey(x.name,x.category,x.subcat)===key);
       if(exists){dup++}else{DB.push({id:slug(name),name:name,category:cat,subcat:sub,cap_ml:cap,abv_pct:abv,tare_g:tare}); added++}
     }
     saveDB(); renderDBAccordion(); showMsg('Импорт: добавлено '+added+', дубликатов '+dup);
   }; fr.readAsText(file,'utf-8')
 }
-function showMsg(s){ var n=$('db-msg'); if(!s){n.style.display='none'; n.textContent=''; return} n.textContent=s; n.style.display='inline' ; setTimeout(()=>showMsg(''),4000) }
+function showMsg(s){ var n=$('db-msg'); if(!s){n.style.display='none'; n.textContent=''; return} n.textContent=s; n.style.display='inline'; setTimeout(()=>showMsg(''),4000) }
 
-/* Рендер базы: аккордеон + редактирование/удаление */
+/* ====== СИНХРОНИЗАЦИЯ ТАКСОНОМИИ ====== */
+function canonizeItem(b){
+  var changed=false;
+  if(SYN.cat[b.category]){b.category=SYN.cat[b.category]; changed=true}
+  if(SYN.sub[b.subcat]){b.subcat=SYN.sub[b.subcat]; changed=true}
+  // если подкатегории нет в справочнике — добавим её в справочник внутри этой категории
+  if(!CATEGORIES[b.category]){ CATEGORIES[b.category]=[]; changed=true }
+  if(CATEGORIES[b.category].indexOf(b.subcat)===-1){ CATEGORIES[b.category].push(b.subcat); changed=true }
+  return changed
+}
+function syncTaxonomy(){
+  var changed=0, addedCats=0, addedSubs=0, unknown=0;
+  // 1) нормализуем и дополняем справочник субкатегориями из базы
+  for(var i=0;i<DB.length;i++){
+    var b=DB[i]; var beforeCat=b.category, beforeSub=b.subcat;
+    var wasKnownCat=!!CATEGORIES[b.category];
+    var wasKnownSub=wasKnownCat && CATEGORIES[b.category].indexOf(b.subcat)!==-1;
+    if(canonizeItem(b)) changed++;
+    if(!wasKnownCat && CATEGORIES[b.category]) addedCats++;
+    if(!wasKnownSub && CATEGORIES[b.category] && CATEGORIES[b.category].indexOf(b.subcat)!==-1) addedSubs++;
+  }
+  // 2) гарантируем, что все категории/подкатегории из справочника отображаются в "Базе" (в т.ч. пустые)
+  renderDBAccordion();
+  saveDB();
+  fillCats(); fillSubs(); fillBottles();
+  showMsg('Синхронизация: обновлено позиций '+changed+', добавлено категорий '+addedCats+', подкатегорий '+addedSubs);
+}
+
+/* Рендер базы: строим по ПОЛНОЙ таксономии + раскладываем позиции */
 function renderDBAccordion(){
   var q=String($('db-search').value||'').toLowerCase();
-  var data={}; // category -> subcat -> [items]
+  // Заготовка по всем категориям/подкатегориям
+  var data={};
+  Object.keys(CATEGORIES).forEach(cat=>{
+    data[cat]={'_count':0};
+    CATEGORIES[cat].forEach(sub=>{data[cat][sub]=[]});
+  });
+  // Вкладываем реальную базу (с учётом поиска)
   DB.forEach(b=>{
     if(q && !b.name.toLowerCase().includes(q)) return;
-    if(!data[b.category]) data[b.category]={_count:0};
+    if(!data[b.category]) data[b.category]={'_count':0}; // на случай редких новых категорий
     if(!data[b.category][b.subcat]) data[b.category][b.subcat]=[];
     data[b.category][b.subcat].push(b); data[b.category]._count++;
   });
+  // HTML
   var html='';
   Object.keys(data).sort().forEach(cat=>{
     var groups=data[cat]; var count=groups._count||0;
@@ -410,13 +469,15 @@ function renderDBAccordion(){
   qsa('[data-del]').forEach(btn=>btn.addEventListener('click',()=>deleteBottle(btn.getAttribute('data-del'))));
   qsa('[data-edit]').forEach(btn=>btn.addEventListener('click',()=>openModal('edit',btn.getAttribute('data-edit'))));
 }
+
+/* Удаление */
 function deleteBottle(id){
   var b=DBMAP()[id]; if(!b) return;
   if(!confirm('Удалить «'+b.name+'» из базы?')) return;
   DB = DB.filter(x=>x.id!==id); saveDB(); renderDBAccordion();
 }
 
-/* Модалка: add/edit */
+/* Модалка */
 var MODAL_MODE='add', EDIT_ID=null;
 function catsOptionsHtml(){return Object.keys(CATEGORIES).map(c=>'<option>'+c+'</option>').join('')}
 function subsOptionsHtml(cat){return (CATEGORIES[cat]||[]).map(s=>'<option>'+s+'</option>').join('')}
@@ -436,7 +497,6 @@ function openModal(mode,id){
 }
 function closeModal(){$('modal').classList.add('hidden')}
 $('m-cat').addEventListener('change',()=>{$('m-sub').innerHTML=subsOptionsHtml($('m-cat').value)});
-
 $('m-save').addEventListener('click',function(){
   var cat=$('m-cat').value, sub=$('m-sub').value, name=$('m-name').value.trim(),
       cap=Number($('m-cap').value), abv=Number($('m-abv').value), tare=Number($('m-tare').value);
@@ -452,9 +512,8 @@ $('m-save').addEventListener('click',function(){
   }
   saveDB(); renderDBAccordion(); fillBottles(); closeModal();
 });
-$('m-cancel').addEventListener('click',closeModal);
 
-/* Калькулятор: вычисление и автодобавление */
+/* Калькулятор */
 function calculate(){
   if(!validateCalc())return;
   var b=DBMAP()[$('bottle-select').value]; if(!b){$('note').textContent='Выберите бутылку';return}
@@ -469,13 +528,9 @@ function calculate(){
 /* Инициализация */
 function fillCatsSubs(){ setOptions($('cat-select'), Object.keys(CATEGORIES)); setOptions($('subcat-select'), CATEGORIES[$('cat-select').value]||[], true) }
 function init(){
-  // профили
   renderProfiles(); loadSessionForActive();
-  // кальк
   fillCatsSubs(); fillBottles(); loadCalcState();
-  // база
   renderDBAccordion();
-  // автодобавление: включено по умолчанию
   var AUTO=getStore('bb_auto_session',true); $('auto-session').checked=!!AUTO;
   $('auto-session').addEventListener('change',function(){setStore('bb_auto_session',this.checked)});
 }
@@ -497,6 +552,7 @@ $('btn-refresh').addEventListener('click',()=>{location.replace(location.pathnam
 
 $('btn-add-bottle').addEventListener('click',()=>openModal('add'));
 $('db-add').addEventListener('click',()=>openModal('add'));
+$('db-sync').addEventListener('click',syncTaxonomy);
 
 $('db-export-csv').addEventListener('click',exportDB);
 $('db-import-csv').addEventListener('click',()=>$('file-csv').click());
