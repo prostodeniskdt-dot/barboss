@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BAR BOSS — инвентаризация (v3.12.0)</title>
+<title>BAR BOSS — инвентаризация (v3.13.0)</title>
 <meta name="theme-color" content="#0e0f13">
 <style>
 html,body{height:100%}
@@ -41,7 +41,6 @@ input.invalid{border-color:#ff3b30;outline:0;box-shadow:0 0 0 1px #ff3b30 inset}
 .kv{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 .footer{opacity:.7;font-size:12px;margin-top:8px}
 .hidden{display:none !important}
-#modal{display:flex}
 .table{width:100%;border-collapse:collapse}
 .table th,.table td{padding:8px;border-bottom:1px solid #1f2230;text-align:left}
 .small{height:36px;font-size:14px;padding:0 10px}
@@ -63,14 +62,15 @@ summary::-webkit-details-marker{display:none}
 .db-fields{display:flex;flex-wrap:wrap;gap:6px}
 .db-fields .badge{margin-right:6px;margin-top:0}
 .db-actions{display:flex;gap:8px}
+#db-msg{display:none;margin-left:auto}
 </style>
 </head>
 <body>
 
-<!-- ШАПКА -->
+<!-- HEADER -->
 <div class="header">
-  <div class="left" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-    <h1>BAR BOSS • v3.12.0</h1>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <h1>BAR BOSS • v3.13.0</h1>
     <div class="tabs">
       <button class="tab active" data-tab="calc" type="button">Калькулятор</button>
       <button class="tab" data-tab="db" type="button">База</button>
@@ -87,7 +87,7 @@ summary::-webkit-details-marker{display:none}
 
 <div class="container">
 
-  <!-- КАЛЬКУЛЯТОР -->
+  <!-- CALC -->
   <section id="tab-calc" class="card">
     <h2>Калькулятор по профилю бутылки</h2>
     <div class="body">
@@ -99,9 +99,7 @@ summary::-webkit-details-marker{display:none}
       <div class="grid grid-3" style="margin-top:8px">
         <div class="row"><label>Бутылка</label><select id="bottle-select"></select></div>
         <div class="row"><label>&nbsp;</label>
-          <div class="actions">
-            <button class="sec" id="btn-add-bottle" type="button">Добавить</button>
-          </div>
+          <div class="actions"><button class="sec" id="btn-add-bottle" type="button">Добавить</button></div>
         </div>
         <div class="row"></div>
       </div>
@@ -115,7 +113,6 @@ summary::-webkit-details-marker{display:none}
         <div class="row"><label>Высота бутылки, см</label><input id="hTot" type="number" inputmode="numeric" placeholder="например, 22"></div>
         <div class="row"><label>Уровень жидкости, см</label><input id="hLiq" type="number" inputmode="numeric" placeholder="например, 10"></div>
       </div>
-
       <div class="sticky-actions" style="margin-top:8px">
         <button class="ok" id="calc" type="button">Рассчитать</button>
         <div id="note" class="muted"></div>
@@ -124,7 +121,6 @@ summary::-webkit-details-marker{display:none}
         </label>
         <button class="sec" id="btn-refresh" type="button" title="Обновить кэш">Обновить кэш</button>
       </div>
-
       <div id="res" class="result"></div>
       <div class="row" style="margin-top:10px">
         <label>Паспорт выбранной бутылки</label>
@@ -133,11 +129,11 @@ summary::-webkit-details-marker{display:none}
     </div>
   </section>
 
-  <!-- БАЗА -->
+  <!-- DB -->
   <section id="tab-db" class="card hidden">
     <h2>База бутылок</h2>
     <div class="body">
-      <div id="db-toolbar" class="actions" style="margin-bottom:8px">
+      <div class="actions" style="gap:10px 12px;margin-bottom:8px;align-items:center">
         <button id="db-add" class="sec" type="button">Добавить бутылку</button>
         <label class="muted">Разделитель CSV</label>
         <select id="csv-delim" class="small"><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select>
@@ -145,13 +141,13 @@ summary::-webkit-details-marker{display:none}
         <button id="db-import-csv" class="small sec" type="button">Импорт CSV</button>
         <input id="file-csv" type="file" accept=".csv,text/csv" class="hidden">
         <input id="db-search" class="small" placeholder="Поиск по базе..." style="min-width:260px">
-        <div id="db-msg" class="badge"></div>
+        <span id="db-msg" class="muted"></span>
       </div>
       <div id="db-accordion"></div>
     </div>
   </section>
 
-  <!-- СЕССИЯ -->
+  <!-- SESSION -->
   <section id="tab-session" class="card hidden">
     <h2>Сессия инвентаризации</h2>
     <div class="body">
@@ -179,11 +175,11 @@ summary::-webkit-details-marker{display:none}
   <div class="footer">BAR BOSS • GitHub Pages • локальные профили и сессии изолированы по устройству/браузеру.</div>
 </div>
 
-<!-- МОДАЛ «Добавить бутылку» -->
+<!-- MODAL: Add/Edit -->
 <div id="modal" class="hidden"
      style="position:fixed;inset:0;background:rgba(0,0,0,.55);align-items:center;justify-content:center;z-index:50;padding:16px">
   <div class="box" style="max-width:640px;width:100%;background:#0f111a;border:1px solid #2a2e3f;border-radius:16px;overflow:hidden">
-    <h3 style="margin:0;padding:12px 14px;border-bottom:1px solid #2a2e3f;background:#121420">Добавить бутылку</h3>
+    <h3 id="m-title" style="margin:0;padding:12px 14px;border-bottom:1px solid #2a2e3f;background:#121420">Добавить бутылку</h3>
     <div class="body" style="padding:14px">
       <div class="grid grid-3">
         <div class="row"><label>Вид алкоголя</label><select id="m-cat"></select></div>
@@ -198,7 +194,7 @@ summary::-webkit-details-marker{display:none}
       <div class="actions" style="margin-top:10px">
         <button id="m-save" type="button">Сохранить</button>
         <button id="m-cancel" class="sec" type="button">Отмена</button>
-        <div id="m-msg" class="badge"></div>
+        <div id="m-msg" class="muted" style="margin-left:auto"></div>
       </div>
     </div>
   </div>
@@ -207,7 +203,7 @@ summary::-webkit-details-marker{display:none}
 <script>
 (function(){
 'use strict';
-var VER='3.12.0';
+var VER='3.13.0';
 function $(id){return document.getElementById(id)}
 function qsa(s){return document.querySelectorAll(s)}
 function fmt(n){return isFinite(n)?Math.round(n):0}
@@ -218,35 +214,52 @@ function getStore(key,def){try{if(lsOK){var v=localStorage.getItem(key);return v
 function setStore(key,val){try{if(lsOK){localStorage.setItem(key,JSON.stringify(val));return}}catch(e){}mem[key]=val}
 function delStore(key){try{if(lsOK){localStorage.removeItem(key)}}catch(e){}}
 
+/* Таксономия (рационализирована под барную инвентаризацию;
+   названия ориентированы на структуру из справочника и общую практику) */
 var CATEGORIES={
  "Водка":["Классическая","Пшеничная","Ржаная","Картофельная","Ароматизированная"],
- "Виски":["Шотландский купажированный","Шотландский односолодовый","Ирландский","Бурбон","Ржаной","Кукурузный","Теннессийский","Канадский","Японский","Японский односолодовый","Японский купажированный"],
- "Бренди (виноградный/фруктовый)":["Коньяк","Арманьяк","Кальвадос","Писко","Граппа/Марка","Орухо","Виноградный бренди (общ.)","Сливовица/Ракия","Абрикосовый/Грушевый"],
- "Ром":["Лёгкий (кубинский)","Золотой","Тёмный","Пряный","Ямайский","Демерара","Барбадос","Агриколь","Navy/Overproof"],
- "Кашаса":["Белая","Золотая/Отлежавшая","Пряная/Ароматизированная"],
- "Текила":["Бланко","Репосадо","Аньехо","Экстра Аньехо","Миксто"],
- "Мескаль и агавовые":["Мескаль (энсабле)","Мескаль (односортовой)","Бакынора","Райсилья","Сотоль"],
- "Джин и семейство":["Лондонский сухой","Олд Том","Плимутский","Дженевер/Йеневер","Sloe gin"],
- "Анисовые":["Абсент","Пастис","Узо","Самбука","Арак (Левант)"],
- "Аквавит":["Дилла/Тмин","Кардамон/Пряный","Прочие скандинавские стили"],
- "Амаро/горькие ликёры":["Фернет","Итальянские амаро (общ.)","Травяные биттер-ликёры"],
- "Ликёры (сладкие)":["Цитрусовые (Triple Sec/Куантро/Курасао)","Кофейные","Ореховые","Сливочные","Фруктовые","Цветочные/Травяные"],
- "Вермуты и аперитивы":["Вермут сухой","Вермут сладкий","Bianco/Extra-Dry","Биттер-аперитив (красный)","Амер"],
- "Укреплённые вина":["Херес (общ.)","Портвейн (общ.)","Мадера"],
- "Азиатские дистилляты":["Байцзю — соусный аромат","Байцзю — сильный аромат","Байцзю — лёгкий аромат","Байцзю — рисовый аромат","Сётю — имо (батат)","Сётю — комэ (рис)","Сётю — муги (ячмень)","Ауамори — классический","Ауамори — кусу (выдержанный)","Соджу — классический","Соджу — ароматизированный","Арак — Батавия","Арак — кокосовый (Шри-Ланка)","Фени — кокос","Фени — кешью","Ламбаног","Лао-Лао"]
+ "Виски":[
+   "Шотландский купажированный","Шотландский односолодовый","Шотландский солодовый купаж","Шотландский зерновой",
+   "Ирландский купажированный","Ирландский Single Pot Still","Ирландский односолодовый",
+   "Бурбон","Теннессийский","Ржаной","Кукурузный","Канадский купажированный",
+   "Японский купажированный","Японский односолодовый"
+ ],
+ "Бренди":[ "Коньяк","Арманьяк","Brandy de Jerez (шерри-бренди)","Кальвадос","Писко","Граппа/Марка","Фруктовые бренди/Ракия","Прочий виноградный бренди" ],
+ "Ром":[ "Белый/лёгкий","Золотой/амбре","Тёмный","Пряный","Оверпруф","Агриколь blanc","Агриколь élevé sous bois/вызрев.","Агриколь vieux","Демерара/Гайана","Барбадос/Ямайка/прочие острова" ],
+ "Кашаса":[ "Branca (белая)","Амбрела/Отлежавшая","Ароматизированная" ],
+ "Агавовые":[ "Текила blanco","Текила reposado","Текила añejo","Текила extra añejo","Текила mixto","Мескаль joven","Мескаль reposado/añejo","Баканора","Райсилья","Сотоль" ],
+ "Джин и семейство":[ "Лондонский сухой","Олд Том","Плимутский","Дженевер/Йеневер","Sloe gin","Современный/авторский" ],
+ "Анисовые":[ "Абсент","Пастис","Узо","Самбука","Арак (Левант/ЮВА)" ],
+ "Аквавит":[ "Карвэй/Тмин","Дилл/Укроп","Пряный (прочие)" ],
+ "Амаро и горькие ликёры":[ "Фернет","Амаро (итальянские общ.)","Травяные биттер-ликёры (краутер)" ],
+ "Ликёры (сладкие)":[ "Цитрусовые (triple sec/curacao)","Кофейные","Ореховые","Сливочные","Фруктовые","Цветочно-травяные","Ягодные" ],
+ "Вермуты и аперитивы":[ "Вермут сухой","Вермут сладкий","Bianco/Extra-dry","Красный биттер-аперитив","Амер/Кинкина" ],
+ "Укреплённые вина":[ "Херес (общ.)","Портвейн (общ.)","Мадера (общ.)" ],
+ "Азиатские дистилляты":[
+   "Байцзю — соусный аромат","Байцзю — сильный аромат","Байцзю — лёгкий аромат","Байцзю — рисовый аромат",
+   "Сётю — имо (батат)","Сётю — комэ (рис)","Сётю — муги (ячмень)","Ауамори — классический","Ауамори — кусу",
+   "Соджу — классический","Соджу — ароматизированный","Арак — Батавия","Арак — кокосовый","Фени — кокос","Фени — кешью","Ламбаног","Лао-Лао/прочие"
+ ]
 };
 
+// База по умолчанию (пример)
 var DEFAULT_DB=[
   {id:"absolut-700",name:"Absolut Vodka 700",category:"Водка",subcat:"Классическая",cap_ml:700,abv_pct:40,tare_g:420},
   {id:"jack-700",name:"Jack Daniel’s 700",category:"Виски",subcat:"Теннессийский",cap_ml:700,abv_pct:40,tare_g:500},
-  {id:"olmeca-750",name:"Olmeca Blanco 750",category:"Текила",subcat:"Бланко",cap_ml:750,abv_pct:40,tare_g:600}
+  {id:"olmeca-750",name:"Olmeca Blanco 750",category:"Агавовые",subcat:"Текила blanco",cap_ml:750,abv_pct:40,tare_g:600}
 ];
 
 var DB=getStore('bb_db_v311',DEFAULT_DB.slice());
 function saveDB(){setStore('bb_db_v311',DB)}
 function DBMAP(){var o={};for(var i=0;i<DB.length;i++){o[DB[i].id]=DB[i]}return o}
-
 function setOptions(el,arr,withAll){var h=withAll?'<option value="">Все</option>':'';for(var i=0;i<arr.length;i++)h+='<option>'+arr[i]+'</option>';el.innerHTML=h}
+
+/* Физика */
+function rhoBase(abv){abv=Math.max(0,Math.min(96,Number(abv)||0));var a0={abv:0,rho:1.0},a1={abv:40,rho:0.948},a2={abv:96,rho:0.805};if(abv<=a1.abv){var t=abv/(a1.abv-a0.abv);return a0.rho+t*(a1.rho-a0.rho)}var t2=(abv-a1.abv)/(a2.abv-a1.abv);return a1.rho+t2*(a2.rho-a1.rho)}
+function vMass(net,abv){return net>0?net/rhoBase(abv):0}
+function vGeom(cap,h,ht){return(!cap||!h||!ht||h<=0||ht<=0)?0:cap*Math.max(0,Math.min(1,h/ht))}
+
+/* Кальк UI */
 function fillCats(){ setOptions($('cat-select'), Object.keys(CATEGORIES), false) }
 function fillSubs(){ setOptions($('subcat-select'), CATEGORIES[$('cat-select').value]||[], true) }
 function fillBottles(){
@@ -262,26 +275,16 @@ function loadPassport(id){
   $('passport').innerHTML='<span class="badge">'+b.category+' → '+b.subcat+'</span><span class="badge">'+b.cap_ml+' мл</span><span class="badge">'+b.abv_pct+'%</span><span class="badge">'+b.tare_g+' г</span>';
   saveCalcState();
 }
-
-// физика
-function rhoBase(abv){abv=Math.max(0,Math.min(96,Number(abv)||0));var a0={abv:0,rho:1.0},a1={abv:40,rho:0.948},a2={abv:96,rho:0.805};if(abv<=a1.abv){var t=abv/(a1.abv-a0.abv);return a0.rho+t*(a1.rho-a0.rho)}var t2=(abv-a1.abv)/(a2.abv-a1.abv);return a1.rho+t2*(a2.rho-a1.rho)}
-function vMass(net,abv){return net>0?net/rhoBase(abv):0}
-function vGeom(cap,h,ht){return(!cap||!h||!ht||h<=0||ht<=0)?0:cap*Math.max(0,Math.min(1,h/ht))}
-
-// валидатор / состояние
 function isNum(n){return n!==''&&!isNaN(n)}
 function validateCalc(){
-  var ok=true, gross=$('gross'), hTot=$('hTot'), hLiq=$('hLiq'), arr=[gross,hTot,hLiq];
-  arr.forEach(i=>i.classList.remove('invalid'));
+  var ok=true, gross=$('gross'), hTot=$('hTot'), hLiq=$('hLiq'); [gross,hTot,hLiq].forEach(i=>i.classList.remove('invalid'));
   if(!isNum(gross.value)){gross.classList.add('invalid');ok=false}
   if(!isNum(hTot.value)||Number(hTot.value)<=0){hTot.classList.add('invalid');ok=false}
   if(!isNum(hLiq.value)||Number(hLiq.value)<0){hLiq.classList.add('invalid');ok=false}
   if(isNum(hLiq.value)&&isNum(hTot.value)&&Number(hLiq.value)>Number(hTot.value)){hLiq.classList.add('invalid');ok=false;$('note').textContent='Уровень не может быть выше высоты.'}else{ if($('note').textContent.startsWith('Уровень')) $('note').textContent='' }
   $('calc').disabled=!ok; return ok
 }
-function saveCalcState(){
-  setStore('bb_calc_v311',{cat:$('cat-select').value,sub:$('subcat-select').value,q:$('search-bottle').value,id:$('bottle-select').value,gross:$('gross').value,hTot:$('hTot').value,hLiq:$('hLiq').value})
-}
+function saveCalcState(){ setStore('bb_calc_v311',{cat:$('cat-select').value,sub:$('subcat-select').value,q:$('search-bottle').value,id:$('bottle-select').value,gross:$('gross').value,hTot:$('hTot').value,hLiq:$('hLiq').value}) }
 function loadCalcState(){
   var st=getStore('bb_calc_v311',null); if(!st) return;
   $('cat-select').value=st.cat||$('cat-select').value; fillSubs(); $('subcat-select').value=st.sub||'';
@@ -289,40 +292,22 @@ function loadCalcState(){
   $('gross').value=st.gross||''; $('hTot').value=st.hTot||''; $('hLiq').value=st.hLiq||''; validateCalc();
 }
 
-// СЕССИИ И ПРОФИЛИ (изоляция)
+/* Сессии и профили */
 var CLIENT=getStore('bb_client_id',null); if(!CLIENT){CLIENT='U'+Math.floor(Math.random()*1e9)+'-'+Date.now().toString(36); setStore('bb_client_id',CLIENT)}
 function sessKeyFor(profileId){return 'bb_sess_v311_'+CLIENT+'__'+profileId}
 var PROFILES=getStore('bb_profiles',[{id:'p1',name:'Профиль 1'}]);
 var ACTIVE=getStore('bb_active_profile',PROFILES[0].id);
-function getActiveProfile(){return ACTIVE}
 function setActiveProfile(id){ACTIVE=id; setStore('bb_active_profile',id)}
-function renderProfiles(){
-  var html=''; for(var i=0;i<PROFILES.length;i++){html+='<option value="'+PROFILES[i].id+'">'+PROFILES[i].name+'</option>'}
-  $('profile-select').innerHTML=html; $('profile-select').value=ACTIVE;
-}
-function addProfile(){
-  var name=prompt('Название профиля:','Профиль '+(PROFILES.length+1)); if(!name) return;
-  var id='p'+Math.floor(Math.random()*1e9).toString(36);
-  PROFILES.push({id:id,name:name}); setStore('bb_profiles',PROFILES); setActiveProfile(id); renderProfiles(); loadSessionForActive()
-}
-function delProfile(){
-  if(PROFILES.length<=1){alert('Нельзя удалить единственный профиль');return}
-  if(!confirm('Удалить текущий профиль? Его сессия тоже будет удалена.')) return;
-  var id=ACTIVE; PROFILES=PROFILES.filter(p=>p.id!==id); setStore('bb_profiles',PROFILES);
-  delStore(sessKeyFor(id));
-  setActiveProfile(PROFILES[0].id); renderProfiles(); loadSessionForActive();
-}
+function renderProfiles(){ $('profile-select').innerHTML=PROFILES.map(p=>'<option value="'+p.id+'">'+p.name+'</option>').join(''); $('profile-select').value=ACTIVE }
+function addProfile(){ var name=prompt('Название профиля:','Профиль '+(PROFILES.length+1)); if(!name) return; var id='p'+Math.floor(Math.random()*1e9).toString(36); PROFILES.push({id:id,name:name}); setStore('bb_profiles',PROFILES); setActiveProfile(id); renderProfiles(); loadSessionForActive() }
+function delProfile(){ if(PROFILES.length<=1){alert('Нельзя удалить единственный профиль');return} if(!confirm('Удалить текущий профиль? Его сессия тоже будет удалена.')) return; var id=ACTIVE; PROFILES=PROFILES.filter(p=>p.id!==id); setStore('bb_profiles',PROFILES); delStore(sessKeyFor(id)); setActiveProfile(PROFILES[0].id); renderProfiles(); loadSessionForActive() }
 $('profile-add').addEventListener('click',addProfile);
 $('profile-del').addEventListener('click',delProfile);
 $('profile-select').addEventListener('change',function(){ setActiveProfile(this.value); loadSessionForActive() });
 
-// СЕССИЯ (по активному профилю)
 var SESS={id:null,rows:[]};
-function saveSESS(){ setStore(sessKeyFor(getActiveProfile()), SESS) }
-function loadSessionForActive(){
-  var st=getStore(sessKeyFor(getActiveProfile()),null);
-  SESS = st || {id:null,rows:[]}; renderSess();
-}
+function saveSESS(){ setStore(sessKeyFor(ACTIVE), SESS) }
+function loadSessionForActive(){ var st=getStore(sessKeyFor(ACTIVE),null); SESS = st || {id:null,rows:[]}; renderSess() }
 function sessNew(){SESS={id:('S'+Math.floor(Date.now()/1000)),rows:[]}; saveSESS(); renderSess()}
 function sessBottleList(q){var list=DB.slice(); if(q){var st=String(q).toLowerCase(); list=list.filter(x=>x.name.toLowerCase().includes(st))} list.sort((a,b)=>a.name.localeCompare(b.name)); $('sess-bottle').innerHTML=list.map(x=>'<option value="'+x.id+'">'+x.name+'</option>').join('')}
 function sessAddRow(){var id=$('sess-bottle').value,b=DBMAP()[id]; if(!b) return; SESS.rows.push({id:id,name:b.name,gross:0,hTot:0,hLiq:0,vol:0,pct:0}); saveSESS(); renderSess()}
@@ -350,7 +335,7 @@ function renderSess(){
   })(rows[j])}
 }
 
-// экспорт
+/* Экспорт / импорт */
 function escCSV(s){s=String(s).replace(/"/g,'""');return /["\n\r,;]/.test(s)?('"'+s+'"'):s}
 function toCSV(rows,delim){var BOM='\ufeff';return BOM+rows.map(r=>r.map(x=>escCSV(x)).join(delim)).join('\r\n')+'\r\n'}
 function exportCSV(filename,rows,delim){var blob=new Blob([toCSV(rows,delim||',')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},200)}
@@ -364,8 +349,6 @@ function parseCSV(text){
   if(field!==''||row.length){row.push(field);rows.push(row)}
   return rows.filter(r=>r.join('').trim()!=='')
 }
-
-// импорт/экспорт БД + удаление позиции
 function exportDB(){
   var rows=[['id','name','category','subcat','cap_ml','abv_pct','tare_g']]; 
   DB.forEach(b=>rows.push([b.id,b.name,b.category,b.subcat,b.cap_ml,b.abv_pct,b.tare_g]));
@@ -373,7 +356,7 @@ function exportDB(){
 }
 function importCSVFile(file){
   var fr=new FileReader(); fr.onload=function(){
-    var rows=parseCSV(fr.result||''); if(!rows.length){$('db-msg').textContent='CSV пуст';return}
+    var rows=parseCSV(fr.result||''); if(!rows.length){showMsg('CSV пуст');return}
     var head=rows[0].map(s=>String(s||'').trim().toLowerCase());
     var idx={name:head.indexOf('name'),category:head.indexOf('category'),subcat:head.indexOf('subcat'),cap_ml:head.indexOf('cap_ml'),abv_pct:head.indexOf('abv_pct'),tare_g:head.indexOf('tare_g')};
     var added=0,dup=0;
@@ -383,16 +366,12 @@ function importCSVFile(file){
       var key=uniqKey(name,cat,sub), exists=DB.some(x=>uniqKey(x.name,x.category,x.subcat)===key);
       if(exists){dup++}else{DB.push({id:slug(name),name:name,category:cat,subcat:sub,cap_ml:cap,abv_pct:abv,tare_g:tare}); added++}
     }
-    saveDB(); renderDBAccordion(); $('db-msg').textContent='Импорт: добавлено '+added+', дубликатов '+dup;
+    saveDB(); renderDBAccordion(); showMsg('Импорт: добавлено '+added+', дубликатов '+dup);
   }; fr.readAsText(file,'utf-8')
 }
-function deleteBottle(id){
-  var b=DBMAP()[id]; if(!b) return;
-  if(!confirm('Удалить «'+b.name+'» из базы?')) return;
-  DB = DB.filter(x=>x.id!==id); saveDB(); renderDBAccordion();
-}
+function showMsg(s){ var n=$('db-msg'); if(!s){n.style.display='none'; n.textContent=''; return} n.textContent=s; n.style.display='inline' ; setTimeout(()=>showMsg(''),4000) }
 
-// компактная БД: аккордеон
+/* Рендер базы: аккордеон + редактирование/удаление */
 function renderDBAccordion(){
   var q=String($('db-search').value||'').toLowerCase();
   var data={}; // category -> subcat -> [items]
@@ -418,6 +397,7 @@ function renderDBAccordion(){
               '<span class="badge">'+b.tare_g+' г</span>'+
               '</div>'+
               '<div class="db-actions">'+
+              '<button class="small sec" data-edit="'+b.id+'">Редактировать</button>'+
               '<button class="small danger" data-del="'+b.id+'">Удалить</button>'+
               '</div>'+
               '</div>';
@@ -428,50 +408,80 @@ function renderDBAccordion(){
   });
   $('db-accordion').innerHTML=html || '<div class="muted">Нет результатов</div>';
   qsa('[data-del]').forEach(btn=>btn.addEventListener('click',()=>deleteBottle(btn.getAttribute('data-del'))));
+  qsa('[data-edit]').forEach(btn=>btn.addEventListener('click',()=>openModal('edit',btn.getAttribute('data-edit'))));
+}
+function deleteBottle(id){
+  var b=DBMAP()[id]; if(!b) return;
+  if(!confirm('Удалить «'+b.name+'» из базы?')) return;
+  DB = DB.filter(x=>x.id!==id); saveDB(); renderDBAccordion();
 }
 
-// модал «добавить»
+/* Модалка: add/edit */
+var MODAL_MODE='add', EDIT_ID=null;
 function catsOptionsHtml(){return Object.keys(CATEGORIES).map(c=>'<option>'+c+'</option>').join('')}
 function subsOptionsHtml(cat){return (CATEGORIES[cat]||[]).map(s=>'<option>'+s+'</option>').join('')}
-function openModal(){$('m-cat').innerHTML=catsOptionsHtml();$('m-sub').innerHTML=subsOptionsHtml($('m-cat').value);$('m-name').value='';$('m-cap').value='';$('m-abv').value='';$('m-tare').value='';$('m-msg').textContent='';$('modal').classList.remove('hidden')}
-function closeModal(){$('modal').classList.add('hidden')}
-function addBottle(){
-  var cat=$('m-cat').value, sub=$('m-sub').value, name=$('m-name').value, cap=Number($('m-cap').value), abv=Number($('m-abv').value), tare=Number($('m-tare').value);
-  if(!name||!cap||!abv||!tare){$('m-msg').textContent='Заполните все поля';return}
-  var key=uniqKey(name,cat,sub); for(var i=0;i<DB.length;i++){if(uniqKey(DB[i].name,DB[i].category,DB[i].subcat)===key){$('m-msg').textContent='Такая бутылка уже существует';return}}
-  DB.push({id:slug(name),name:name,category:cat,subcat:sub,cap_ml:cap,abv_pct:abv,tare_g:tare}); saveDB(); renderDBAccordion(); fillBottles(); $('m-msg').textContent='Сохранено'; setTimeout(closeModal,350)
+function openModal(mode,id){
+  MODAL_MODE=mode||'add'; EDIT_ID=id||null;
+  $('m-title').textContent = (MODAL_MODE==='edit'?'Редактировать позицию':'Добавить бутылку');
+  $('m-cat').innerHTML=catsOptionsHtml();
+  $('m-sub').innerHTML=subsOptionsHtml($('m-cat').value);
+  $('m-name').value=''; $('m-cap').value=''; $('m-abv').value=''; $('m-tare').value=''; $('m-msg').textContent='';
+  if(MODAL_MODE==='edit' && EDIT_ID){
+    var b=DBMAP()[EDIT_ID]; if(b){
+      $('m-cat').value=b.category; $('m-sub').innerHTML=subsOptionsHtml(b.category); $('m-sub').value=b.subcat;
+      $('m-name').value=b.name; $('m-cap').value=b.cap_ml; $('m-abv').value=b.abv_pct; $('m-tare').value=b.tare_g;
+    }
+  }
+  $('modal').classList.remove('hidden');
 }
+function closeModal(){$('modal').classList.add('hidden')}
+$('m-cat').addEventListener('change',()=>{$('m-sub').innerHTML=subsOptionsHtml($('m-cat').value)});
 
-// калькуляция + автодобавление в сессию
+$('m-save').addEventListener('click',function(){
+  var cat=$('m-cat').value, sub=$('m-sub').value, name=$('m-name').value.trim(),
+      cap=Number($('m-cap').value), abv=Number($('m-abv').value), tare=Number($('m-tare').value);
+  if(!name||!cap||!abv||!tare){$('m-msg').textContent='Заполните все поля';return}
+  var key=uniqKey(name,cat,sub);
+  if(MODAL_MODE==='add'){
+    if(DB.some(x=>uniqKey(x.name,x.category,x.subcat)===key)){ $('m-msg').textContent='Такая бутылка уже существует'; return }
+    DB.push({id:slug(name),name:name,category:cat,subcat:sub,cap_ml:cap,abv_pct:abv,tare_g:tare});
+  } else {
+    var b=DBMAP()[EDIT_ID]; if(!b){$('m-msg').textContent='Ошибка: запись не найдена';return}
+    if(DB.some(x=>x.id!==EDIT_ID && uniqKey(x.name,x.category,x.subcat)===key)){ $('m-msg').textContent='Конфликт: такая запись уже есть'; return }
+    b.name=name; b.category=cat; b.subcat=sub; b.cap_ml=cap; b.abv_pct=abv; b.tare_g=tare;
+  }
+  saveDB(); renderDBAccordion(); fillBottles(); closeModal();
+});
+$('m-cancel').addEventListener('click',closeModal);
+
+/* Калькулятор: вычисление и автодобавление */
 function calculate(){
   if(!validateCalc())return;
   var b=DBMAP()[$('bottle-select').value]; if(!b){$('note').textContent='Выберите бутылку';return}
   var gross=Number($('gross').value), hTot=Number($('hTot').value), hLiq=Number($('hLiq').value);
   var net=Math.max(0,gross-b.tare_g), vM=vMass(net,b.abv_pct), vG=vGeom(b.cap_ml,hLiq,hTot);
-  var V=(vM>0&&vG>0)?(vM+vG)/2:(vM>0?vM:vG);
-  V=Math.max(0,Math.min(b.cap_ml,V)); var pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0;
+  var V=(vM>0&&vG>0)?(vM+vG)/2:(vM>0?vM:vG); V=Math.max(0,Math.min(b.cap_ml,V));
+  var pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0;
   $('res').innerHTML='<div class="big">≈ '+fmt(V)+' мл</div><div class="kv"><span class="badge">по массе: '+fmt(vM)+' мл</span><span class="badge">по высоте: '+fmt(vG)+' мл</span><span class="badge">заполнено ≈ '+fmt(pct)+'%</span></div>';
   if($('auto-session').checked){ if(!SESS.id) sessNew(); SESS.rows.push({id:b.id,name:b.name,gross:gross,hTot:hTot,hLiq:hLiq,vol:V,pct:pct}); saveSESS(); renderSess(); }
 }
 
-// инициализация
+/* Инициализация */
+function fillCatsSubs(){ setOptions($('cat-select'), Object.keys(CATEGORIES)); setOptions($('subcat-select'), CATEGORIES[$('cat-select').value]||[], true) }
 function init(){
   // профили
   renderProfiles(); loadSessionForActive();
-
-  // калькулятор
-  fillCats(); fillSubs(); fillBottles(); loadCalcState();
-
+  // кальк
+  fillCatsSubs(); fillBottles(); loadCalcState();
   // база
   renderDBAccordion();
-
-  // автодобавление — по умолчанию включено
+  // автодобавление: включено по умолчанию
   var AUTO=getStore('bb_auto_session',true); $('auto-session').checked=!!AUTO;
   $('auto-session').addEventListener('change',function(){setStore('bb_auto_session',this.checked)});
 }
 init();
 
-// события
+/* Слушатели */
 document.querySelector('[data-tab="calc"]').addEventListener('click',()=>switchTab('calc'));
 document.querySelector('[data-tab="db"]').addEventListener('click',()=>switchTab('db'));
 document.querySelector('[data-tab="session"]').addEventListener('click',()=>switchTab('session'));
@@ -485,23 +495,18 @@ qsa('#gross,#hTot,#hLiq').forEach(el=>el.addEventListener('input',()=>{validateC
 $('calc').addEventListener('click',calculate);
 $('btn-refresh').addEventListener('click',()=>{location.replace(location.pathname+'?v='+VER.replace(/\./g,'')+'-'+Date.now())});
 
-// модал
-$('btn-add-bottle').addEventListener('click',openModal); $('db-add').addEventListener('click',openModal);
-$('m-cat').addEventListener('change',()=>{$('m-sub').innerHTML=subsOptionsHtml($('m-cat').value)});
-$('m-save').addEventListener('click',addBottle); $('m-cancel').addEventListener('click',closeModal);
+$('btn-add-bottle').addEventListener('click',()=>openModal('add'));
+$('db-add').addEventListener('click',()=>openModal('add'));
 
-// база
 $('db-export-csv').addEventListener('click',exportDB);
 $('db-import-csv').addEventListener('click',()=>$('file-csv').click());
 $('file-csv').addEventListener('change',function(){if(this.files&&this.files[0]) importCSVFile(this.files[0]); this.value=''});
 $('db-search').addEventListener('input',renderDBAccordion);
 
-// сессия
 $('sess-new').addEventListener('click',sessNew);
 $('sess-add-row').addEventListener('click',sessAddRow);
 $('sess-export-csv').addEventListener('click',()=>{var rows=[['#','name','gross_g','height_cm','level_cm','volume_ml','percent']]; for(var i=0;i<SESS.rows.length;i++){var r=SESS.rows[i]; rows.push([i+1,r.name,r.gross,r.hTot,r.hLiq,fmt(r.vol),fmt(r.pct)])} exportCSV('barboss-session.csv',rows,$('csv-delim2').value||',')});
 $('sess-search').addEventListener('input',()=>sessBottleList($('sess-search').value));
-
 })();
 </script>
 </body>
