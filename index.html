@@ -2,19 +2,29 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BAR BOSS — инвентаризация (v3.11.2)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAR BOSS — инвентаризация (v3.12.0)</title>
 <meta name="theme-color" content="#0e0f13">
 <style>
 html,body{height:100%}
 *{box-sizing:border-box}
 body{margin:0;background:#0e0f13;color:#f5f5f5;font:16px/1.45 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial}
 .container{max-width:1100px;margin:0 auto;padding:16px}
-.header{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid #1f2230;background:#0e0f13;position:sticky;top:0;z-index:5}
-h1{margin:0;font-size:20px;font-weight:900}
+.header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;border-bottom:1px solid #1f2230;background:#0e0f13;position:sticky;top:0;z-index:5;flex-wrap:wrap}
+h1{margin:0;font-size:18px;font-weight:900}
 .tabs{display:flex;gap:8px;flex-wrap:wrap}
 .tab{padding:8px 12px;border:1px solid #1f2230;border-radius:10px;background:#0b0d16;color:#fff;cursor:pointer}
 .tab.active{background:#ffd400;color:#111;font-weight:800}
+.profile-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.profile-bar label{font-size:12px;color:#a3a8b3}
+select,button,input,textarea{font-family:inherit}
+input,select,textarea{width:100%;height:44px;padding:0 10px;border-radius:10px;border:1px solid #2a2e3f;background:#0b0d16;color:#fff;min-width:0}
+button{height:44px;border-radius:10px;border:0;background:#ffd400;color:#111;font-weight:800;padding:0 14px;cursor:pointer}
+button:disabled{opacity:.6;cursor:not-allowed}
+button.sec{background:#171a28;color:#fff;border:1px solid #2a2e3f}
+button.ok{background:#2ecc71;color:#fff}
+button.warn{background:#ff9500;color:#111}
+button.danger{background:#ff3b30;color:#fff}
 .card{background:#121420;border:1px solid #1f2230;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.35);overflow:hidden;margin-top:16px}
 .card h2{margin:0;padding:12px 14px;border-bottom:1px solid #1f2230;background:#0f111a;font-size:18px}
 .card .body{padding:14px}
@@ -23,97 +33,99 @@ h1{margin:0;font-size:20px;font-weight:900}
 .grid-2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
 .row{display:grid;gap:6px;min-width:0}
 label{font-size:12px;color:#a3a8b3}
-input,select,button,textarea{font-family:inherit}
-input,select,textarea{width:100%;height:44px;padding:0 10px;border-radius:10px;border:1px solid #2a2e3f;background:#0b0d16;color:#fff;min-width:0}
 input.invalid{border-color:#ff3b30;outline:0;box-shadow:0 0 0 1px #ff3b30 inset}
-textarea{height:120px;resize:vertical}
-button{height:44px;border-radius:10px;border:0;background:#ffd400;color:#111;font-weight:800;padding:0 14px;cursor:pointer}
-button:disabled{opacity:.6;cursor:not-allowed}
-button.sec{background:#171a28;color:#fff;border:1px solid #2a2e3f}
-button.ok{background:#2ecc71;color:#fff}
-button.warn{background:#ff9500;color:#111}
-button.danger{background:#ff3b30;color:#fff}
 .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .result{padding:10px;border:1px dashed #2a2e3f;border-radius:10px;background:#0b0d16;margin-top:10px}
 .big{font-size:24px;font-weight:900;color:#ffd400}
 .badge{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #2a2e3f;background:#0b0d16;color:#9aa;font-size:12px;margin-right:6px;margin-top:4px}
-.footer{opacity:.7;font-size:12px;margin-top:8px}
 .kv{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.footer{opacity:.7;font-size:12px;margin-top:8px}
 .hidden{display:none !important}
 #modal{display:flex}
-
-/* DB toolbar */
-#db-toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:8px}
-
-/* sticky calc on mobile */
-@media (max-width: 520px){
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:8px;border-bottom:1px solid #1f2230;text-align:left}
+.small{height:36px;font-size:14px;padding:0 10px}
+.muted{color:#a3a8b3;font-size:12px}
+.link{color:#ffd400;cursor:pointer}
+.sticky-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+@media (max-width: 560px){
   .sticky-actions{position:sticky;bottom:8px;z-index:4;background:#121420d9;backdrop-filter:saturate(120%) blur(6px);padding:8px;border-radius:12px;border:1px solid #1f2230}
 }
+/* Accordion */
+details{border:1px solid #1f2230;border-radius:12px;background:#0b0d16}
+details+details{margin-top:10px}
+summary{cursor:pointer;list-style:none;padding:10px 12px;border-radius:12px;display:flex;align-items:center;justify-content:space-between}
+summary::-webkit-details-marker{display:none}
+.cat-title{font-weight:800}
+.subgroup{padding:8px 12px;border-top:1px solid #1f2230}
+.sub-title{font-weight:700;margin:6px 0}
+.db-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border:1px solid #1f2230;border-radius:10px;background:#0f111a;margin-top:8px}
+.db-fields{display:flex;flex-wrap:wrap;gap:6px}
+.db-fields .badge{margin-right:6px;margin-top:0}
+.db-actions{display:flex;gap:8px}
 </style>
 </head>
 <body>
+
+<!-- ШАПКА -->
 <div class="header">
-  <div class="container" style="display:flex;flex-direction:column;gap:8px">
-    <h1>BAR BOSS — инвентаризация (v3.11.2)</h1>
+  <div class="left" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <h1>BAR BOSS • v3.12.0</h1>
     <div class="tabs">
       <button class="tab active" data-tab="calc" type="button">Калькулятор</button>
       <button class="tab" data-tab="db" type="button">База</button>
       <button class="tab" data-tab="session" type="button">Сессия</button>
     </div>
   </div>
+  <div class="profile-bar">
+    <label for="profile-select">Профиль:</label>
+    <select id="profile-select" class="small"></select>
+    <button id="profile-add" class="small sec" type="button">Добавить профиль</button>
+    <button id="profile-del" class="small danger" type="button">Удалить профиль</button>
+  </div>
 </div>
 
 <div class="container">
+
+  <!-- КАЛЬКУЛЯТОР -->
   <section id="tab-calc" class="card">
     <h2>Калькулятор по профилю бутылки</h2>
     <div class="body">
       <div class="grid grid-3">
-        <div class="row">
-          <label>Вид алкоголя</label>
-          <select id="cat-select"></select>
-        </div>
-        <div class="row">
-          <label>Подкатегория</label>
-          <select id="subcat-select"></select>
-        </div>
-        <div class="row">
-          <label>Поиск</label>
-          <input id="search-bottle" placeholder="Начните печатать...">
-        </div>
+        <div class="row"><label>Вид алкоголя</label><select id="cat-select"></select></div>
+        <div class="row"><label>Подкатегория</label><select id="subcat-select"></select></div>
+        <div class="row"><label>Поиск</label><input id="search-bottle" placeholder="Начните печатать..."></div>
       </div>
-
       <div class="grid grid-3" style="margin-top:8px">
         <div class="row"><label>Бутылка</label><select id="bottle-select"></select></div>
-        <div class="row">
-          <label>&nbsp;</label>
+        <div class="row"><label>&nbsp;</label>
           <div class="actions">
             <button class="sec" id="btn-add-bottle" type="button">Добавить</button>
-            <button class="danger" id="btn-reset-db" type="button">Сбросить базу</button>
           </div>
         </div>
         <div class="row"></div>
       </div>
-
       <div class="grid grid-3" style="margin-top:8px">
         <div class="row"><label>Номинал, мл</label><input id="cap" disabled></div>
         <div class="row"><label>Крепость, %</label><input id="abv" disabled></div>
         <div class="row"><label>Пустая тара, г</label><input id="tare" disabled></div>
       </div>
-
       <div class="grid grid-3" style="margin-top:8px">
         <div class="row"><label>Вес сейчас, г</label><input id="gross" type="number" inputmode="decimal" placeholder="например, 1009"></div>
         <div class="row"><label>Высота бутылки, см</label><input id="hTot" type="number" inputmode="numeric" placeholder="например, 22"></div>
         <div class="row"><label>Уровень жидкости, см</label><input id="hLiq" type="number" inputmode="numeric" placeholder="например, 10"></div>
       </div>
 
-      <div class="actions sticky-actions" style="margin-top:8px">
+      <div class="sticky-actions" style="margin-top:8px">
         <button class="ok" id="calc" type="button">Рассчитать</button>
-        <div id="note"></div>
+        <div id="note" class="muted"></div>
+        <label style="display:flex;align-items:center;gap:8px;margin-left:auto;font-size:13px;color:#a3a8b3">
+          <input id="auto-session" type="checkbox" style="width:16px;height:16px"> Автодобавлять в сессию
+        </label>
         <button class="sec" id="btn-refresh" type="button" title="Обновить кэш">Обновить кэш</button>
       </div>
 
       <div id="res" class="result"></div>
-
       <div class="row" style="margin-top:10px">
         <label>Паспорт выбранной бутылки</label>
         <div id="passport" class="result"></div>
@@ -121,31 +133,33 @@ button.danger{background:#ff3b30;color:#fff}
     </div>
   </section>
 
+  <!-- БАЗА -->
   <section id="tab-db" class="card hidden">
     <h2>База бутылок</h2>
     <div class="body">
-      <div id="db-toolbar">
+      <div id="db-toolbar" class="actions" style="margin-bottom:8px">
         <button id="db-add" class="sec" type="button">Добавить бутылку</button>
-        <label for="csv-delim" style="font-size:12px;color:#a3a8b3">Разделитель CSV</label>
-        <select id="csv-delim"><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select>
-        <button id="db-export-csv" type="button">Экспорт CSV</button>
-        <button id="db-import-csv" class="sec" type="button">Импорт CSV</button>
+        <label class="muted">Разделитель CSV</label>
+        <select id="csv-delim" class="small"><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select>
+        <button id="db-export-csv" class="small" type="button">Экспорт CSV</button>
+        <button id="db-import-csv" class="small sec" type="button">Импорт CSV</button>
         <input id="file-csv" type="file" accept=".csv,text/csv" class="hidden">
-        <button id="db-reset" class="danger" type="button">Сбросить базу</button>
+        <input id="db-search" class="small" placeholder="Поиск по базе..." style="min-width:260px">
         <div id="db-msg" class="badge"></div>
       </div>
-      <div id="db-list" class="grid grid-3" style="gap:10px"></div>
+      <div id="db-accordion"></div>
     </div>
   </section>
 
+  <!-- СЕССИЯ -->
   <section id="tab-session" class="card hidden">
     <h2>Сессия инвентаризации</h2>
     <div class="body">
       <div class="actions">
         <button id="sess-new" class="ok" type="button">Новая сессия</button>
-        <label for="csv-delim2" style="font-size:12px;color:#a3a8b3">Разделитель CSV</label>
-        <select id="csv-delim2"><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select>
-        <button id="sess-export-csv" class="sec" type="button">Экспорт CSV</button>
+        <label class="muted">Разделитель CSV</label>
+        <select id="csv-delim2" class="small"><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select>
+        <button id="sess-export-csv" class="small sec" type="button">Экспорт CSV</button>
         <div class="badge" id="sess-info"></div>
       </div>
       <div class="grid grid-3">
@@ -153,7 +167,7 @@ button.danger{background:#ff3b30;color:#fff}
         <div class="row"><label>Бутылка</label><select id="sess-bottle"></select></div>
         <div class="row"><label>&nbsp;</label><button id="sess-add-row" type="button">Добавить строку</button></div>
       </div>
-      <div class="result">
+      <div class="result" style="overflow:auto">
         <table class="table" id="sess-table">
           <thead><tr><th>#</th><th>Бутылка</th><th>Вес, г</th><th>Высота, см</th><th>Уровень, см</th><th>Объём, мл</th><th>%</th><th></th></tr></thead>
           <tbody></tbody>
@@ -162,13 +176,12 @@ button.danger{background:#ff3b30;color:#fff}
     </div>
   </section>
 
-  <div class="footer">BAR BOSS • v3.11.2 • GitHub Pages версия • без сервис-воркеров, максимум совместимости (iOS/вебвью).</div>
+  <div class="footer">BAR BOSS • GitHub Pages • локальные профили и сессии изолированы по устройству/браузеру.</div>
 </div>
 
-<!-- Модал добавления — без display:flex в inline-стиле -->
+<!-- МОДАЛ «Добавить бутылку» -->
 <div id="modal" class="hidden"
-     style="position:fixed;inset:0;background:rgba(0,0,0,.55);
-            align-items:center;justify-content:center;z-index:50;padding:16px">
+     style="position:fixed;inset:0;background:rgba(0,0,0,.55);align-items:center;justify-content:center;z-index:50;padding:16px">
   <div class="box" style="max-width:640px;width:100%;background:#0f111a;border:1px solid #2a2e3f;border-radius:16px;overflow:hidden">
     <h3 style="margin:0;padding:12px 14px;border-bottom:1px solid #2a2e3f;background:#121420">Добавить бутылку</h3>
     <div class="body" style="padding:14px">
@@ -194,62 +207,46 @@ button.danger{background:#ff3b30;color:#fff}
 <script>
 (function(){
 'use strict';
-var VER='3.11.2';
-function $(id){return document.getElementById(id);}
-function fmt(n){return isFinite(n)?Math.round(n):0;}
-function slug(s){return (String(s||'').toLowerCase().replace(/[^a-z0-9а-яё]+/gi,'-').replace(/^-+|-+$/g,'')+'-'+Math.floor(Math.random()*1e6).toString(36));}
-function uniqKey(n,c,sb){return [String(n||'').trim().toLowerCase(),String(c||'').toLowerCase(),String(sb||'').toLowerCase()].join('||');}
-function qsa(sel){return document.querySelectorAll(sel);}
+var VER='3.12.0';
+function $(id){return document.getElementById(id)}
+function qsa(s){return document.querySelectorAll(s)}
+function fmt(n){return isFinite(n)?Math.round(n):0}
+function slug(s){return (String(s||'').toLowerCase().replace(/[^a-z0-9а-яё]+/gi,'-').replace(/^-+|-+$/g,'')+'-'+Math.floor(Math.random()*1e6).toString(36))}
+function uniqKey(n,c,sb){return [String(n||'').trim().toLowerCase(),String(c||'').toLowerCase(),String(sb||'').toLowerCase()].join('||')}
+var mem={},lsOK=false;try{var k='__bb__'+Math.random();localStorage.setItem(k,'1');localStorage.removeItem(k);lsOK=true}catch(e){lsOK=false}
+function getStore(key,def){try{if(lsOK){var v=localStorage.getItem(key);return v?JSON.parse(v):def}}catch(e){}return (mem[key]!==undefined)?mem[key]:def}
+function setStore(key,val){try{if(lsOK){localStorage.setItem(key,JSON.stringify(val));return}}catch(e){}mem[key]=val}
+function delStore(key){try{if(lsOK){localStorage.removeItem(key)}}catch(e){}}
 
-var CATEGORIES = {
-  "Водка":["Классическая","Пшеничная","Ржаная","Картофельная","Ароматизированная"],
-  "Виски":["Шотландский купажированный","Шотландский односолодовый","Ирландский","Бурбон","Ржаной","Кукурузный","Теннессийский","Канадский","Японский"],
-  "Бренди (виноградный/фруктовый)":["Коньяк","Арманьяк","Кальвадос","Писко","Граппа/Марка","Орухо","Виноградный бренди (общ.)","Сливовица/Ракия","Абрикосовый/Грушевый"],
-  "Ром":["Лёгкий (кубинский)","Золотой","Тёмный","Пряный","Ямайский","Демерара","Барбадос","Агриколь","Navy/Overproof"],
-  "Кашаса":["Белая","Золотая/Отлежавшая","Пряная/Ароматизированная"],
-  "Текила":["Бланко","Репосадо","Аньехо","Экстра Аньехо","Миксто"],
-  "Мескаль и агавовые":["Мескаль (энсабле)","Мескаль (односортовой)","Бакынора","Райсилья","Сотоль"],
-  "Джин и семейство":["Лондонский сухой","Олд Том","Плимутский","Дженевер/Йеневер","Sloe gin"],
-  "Анисовые":["Абсент","Пастис","Узо","Самбука","Арак (Левант)"],
-  "Аквавит":["Дилла/Тмин","Кардамон/Пряный","Прочие скандинавские стили"],
-  "Амаро/горькие ликёры":["Фернет","Итальянские амаро (общ.)","Травяные биттер-ликёры"],
-  "Ликёры (сладкие)":["Цитрусовые (Triple Sec/Куантро/Курасао)","Кофейные","Ореховые","Сливочные","Фруктовые","Цветочные/Травяные"],
-  "Вермуты и аперитивы":["Вермут сухой","Вермут сладкий","Bianco/Extra-Dry","Биттер-аперитив (красный)","Амер"],
-  "Укреплённые вина":["Херес (общ.)","Портвейн (общ.)","Мадера"],
-  "Азиатские дистилляты":[
-    "Байцзю — соусный аромат","Байцзю — сильный аромат","Байцзю — лёгкий аромат","Байцзю — рисовый аромат",
-    "Сётю — имо (батат)","Сётю — комэ (рис)","Сётю — муги (ячмень)",
-    "Ауамори — классический","Ауамори — кусу (выдержанный)",
-    "Соджу — классический","Соджу — ароматизированный",
-    "Арак — Батавия","Арак — кокосовый (Шри-Ланка)",
-    "Фени — кокос","Фени — кешью",
-    "Ламбаног","Лао-Лао"
-  ]
+var CATEGORIES={
+ "Водка":["Классическая","Пшеничная","Ржаная","Картофельная","Ароматизированная"],
+ "Виски":["Шотландский купажированный","Шотландский односолодовый","Ирландский","Бурбон","Ржаной","Кукурузный","Теннессийский","Канадский","Японский","Японский односолодовый","Японский купажированный"],
+ "Бренди (виноградный/фруктовый)":["Коньяк","Арманьяк","Кальвадос","Писко","Граппа/Марка","Орухо","Виноградный бренди (общ.)","Сливовица/Ракия","Абрикосовый/Грушевый"],
+ "Ром":["Лёгкий (кубинский)","Золотой","Тёмный","Пряный","Ямайский","Демерара","Барбадос","Агриколь","Navy/Overproof"],
+ "Кашаса":["Белая","Золотая/Отлежавшая","Пряная/Ароматизированная"],
+ "Текила":["Бланко","Репосадо","Аньехо","Экстра Аньехо","Миксто"],
+ "Мескаль и агавовые":["Мескаль (энсабле)","Мескаль (односортовой)","Бакынора","Райсилья","Сотоль"],
+ "Джин и семейство":["Лондонский сухой","Олд Том","Плимутский","Дженевер/Йеневер","Sloe gin"],
+ "Анисовые":["Абсент","Пастис","Узо","Самбука","Арак (Левант)"],
+ "Аквавит":["Дилла/Тмин","Кардамон/Пряный","Прочие скандинавские стили"],
+ "Амаро/горькие ликёры":["Фернет","Итальянские амаро (общ.)","Травяные биттер-ликёры"],
+ "Ликёры (сладкие)":["Цитрусовые (Triple Sec/Куантро/Курасао)","Кофейные","Ореховые","Сливочные","Фруктовые","Цветочные/Травяные"],
+ "Вермуты и аперитивы":["Вермут сухой","Вермут сладкий","Bianco/Extra-Dry","Биттер-аперитив (красный)","Амер"],
+ "Укреплённые вина":["Херес (общ.)","Портвейн (общ.)","Мадера"],
+ "Азиатские дистилляты":["Байцзю — соусный аромат","Байцзю — сильный аромат","Байцзю — лёгкий аромат","Байцзю — рисовый аромат","Сётю — имо (батат)","Сётю — комэ (рис)","Сётю — муги (ячмень)","Ауамори — классический","Ауамори — кусу (выдержанный)","Соджу — классический","Соджу — ароматизированный","Арак — Батавия","Арак — кокосовый (Шри-Ланка)","Фени — кокос","Фени — кешью","Ламбаног","Лао-Лао"]
 };
 
-var DEFAULT_DB = [
+var DEFAULT_DB=[
   {id:"absolut-700",name:"Absolut Vodka 700",category:"Водка",subcat:"Классическая",cap_ml:700,abv_pct:40,tare_g:420},
   {id:"jack-700",name:"Jack Daniel’s 700",category:"Виски",subcat:"Теннессийский",cap_ml:700,abv_pct:40,tare_g:500},
   {id:"olmeca-750",name:"Olmeca Blanco 750",category:"Текила",subcat:"Бланко",cap_ml:750,abv_pct:40,tare_g:600}
 ];
 
-// storage
-var mem={},lsOK=false;try{var k='__bb__'+Math.random();localStorage.setItem(k,'1');localStorage.removeItem(k);lsOK=true;}catch(e){lsOK=false;}
-function getStore(key,def){try{if(lsOK){var v=localStorage.getItem(key);return v?JSON.parse(v):def}}catch(e){}return (mem[key]!==undefined)?mem[key]:def}
-function setStore(key,val){try{if(lsOK){localStorage.setItem(key,JSON.stringify(val));return}}catch(e){}mem[key]=val}
-
-// физика
-function rhoBase(abv){abv=Math.max(0,Math.min(96,Number(abv)||0));var a0={abv:0,rho:1.0},a1={abv:40,rho:0.948},a2={abv:96,rho:0.805};if(abv<=a1.abv){var t=abv/(a1.abv-a0.abv);return a0.rho+t*(a1.rho-a0.rho)}var t2=(abv-a1.abv)/(a2.abv-a1.abv);return a1.rho+t2*(a2.rho-a1.rho)}
-function vMass(net,abv){return net>0?net/rhoBase(abv):0}
-function vGeom(cap,h,ht){return(!cap||!h||!ht||h<=0||ht<=0)?0:cap*Math.max(0,Math.min(1,h/ht))}
-
-// БД
 var DB=getStore('bb_db_v311',DEFAULT_DB.slice());
 function saveDB(){setStore('bb_db_v311',DB)}
 function DBMAP(){var o={};for(var i=0;i<DB.length;i++){o[DB[i].id]=DB[i]}return o}
 
-// UI заполнение
-function setOptions(el,arr,withAll){var html=withAll?'<option value="">Все</option>':'';for(var i=0;i<arr.length;i++){html+='<option>'+arr[i]+'</option>'}el.innerHTML=html}
+function setOptions(el,arr,withAll){var h=withAll?'<option value="">Все</option>':'';for(var i=0;i<arr.length;i++)h+='<option>'+arr[i]+'</option>';el.innerHTML=h}
 function fillCats(){ setOptions($('cat-select'), Object.keys(CATEGORIES), false) }
 function fillSubs(){ setOptions($('subcat-select'), CATEGORIES[$('cat-select').value]||[], true) }
 function fillBottles(){
@@ -257,7 +254,7 @@ function fillBottles(){
   var list=DB.filter(b=>(!cat||b.category===cat)&&(!sub||sub==='Все'||b.subcat===sub)&&(!q||b.name.toLowerCase().includes(q)));
   list.sort((a,b)=>a.name.localeCompare(b.name));
   $('bottle-select').innerHTML=list.map(b=>'<option value="'+b.id+'">'+b.name+'</option>').join('');
-  if(list.length){loadPassport(list[0].id)} else {$('passport').innerHTML=''; $('cap').value=''; $('abv').value=''; $('tare').value='';}
+  if(list.length){loadPassport(list[0].id)}else{$('passport').innerHTML='';$('cap').value='';$('abv').value='';$('tare').value='';}
 }
 function loadPassport(id){
   var b=DBMAP()[id]; if(!b) return;
@@ -265,6 +262,11 @@ function loadPassport(id){
   $('passport').innerHTML='<span class="badge">'+b.category+' → '+b.subcat+'</span><span class="badge">'+b.cap_ml+' мл</span><span class="badge">'+b.abv_pct+'%</span><span class="badge">'+b.tare_g+' г</span>';
   saveCalcState();
 }
+
+// физика
+function rhoBase(abv){abv=Math.max(0,Math.min(96,Number(abv)||0));var a0={abv:0,rho:1.0},a1={abv:40,rho:0.948},a2={abv:96,rho:0.805};if(abv<=a1.abv){var t=abv/(a1.abv-a0.abv);return a0.rho+t*(a1.rho-a0.rho)}var t2=(abv-a1.abv)/(a2.abv-a1.abv);return a1.rho+t2*(a2.rho-a1.rho)}
+function vMass(net,abv){return net>0?net/rhoBase(abv):0}
+function vGeom(cap,h,ht){return(!cap||!h||!ht||h<=0||ht<=0)?0:cap*Math.max(0,Math.min(1,h/ht))}
 
 // валидатор / состояние
 function isNum(n){return n!==''&&!isNaN(n)}
@@ -282,83 +284,46 @@ function saveCalcState(){
 }
 function loadCalcState(){
   var st=getStore('bb_calc_v311',null); if(!st) return;
-  $('cat-select').value=st.cat||$('cat-select').value; fillSubs(); $('subcat-select').value=st.sub||''; 
-  $('search-bottle').value=st.q||''; fillBottles(); if(st.id&&DBMAP()[st.id]){ $('bottle-select').value=st.id; loadPassport(st.id) }
+  $('cat-select').value=st.cat||$('cat-select').value; fillSubs(); $('subcat-select').value=st.sub||'';
+  $('search-bottle').value=st.q||''; fillBottles(); if(st.id&&DBMAP()[st.id]){$('bottle-select').value=st.id; loadPassport(st.id)}
   $('gross').value=st.gross||''; $('hTot').value=st.hTot||''; $('hLiq').value=st.hLiq||''; validateCalc();
 }
 
-// расчёт
-function calculate(){
-  if(!validateCalc())return;
-  var b=DBMAP()[$('bottle-select').value]; if(!b){$('note').textContent='Выберите бутылку';return}
-  var gross=Number($('gross').value), hTot=Number($('hTot').value), hLiq=Number($('hLiq').value);
-  var net=Math.max(0,gross-b.tare_g);
-  var vM=vMass(net,b.abv_pct);
-  var vG=vGeom(b.cap_ml,hLiq,hTot);
-  var V;
-  if(vM>0 && vG>0){ V=(vM+vG)/2; }
-  else if(vM>0){ V=vM; }
-  else { V=vG; }
-  V=Math.max(0,Math.min(b.cap_ml,V));
-  var pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0;
-  $('res').innerHTML='<div class="big">≈ '+fmt(V)+' мл</div><div class="kv"><span class="badge">по массе: '+fmt(vM)+' мл</span><span class="badge">по высоте: '+fmt(vG)+' мл</span><span class="badge">заполнено ≈ '+fmt(pct)+'%</span></div>';
+// СЕССИИ И ПРОФИЛИ (изоляция)
+var CLIENT=getStore('bb_client_id',null); if(!CLIENT){CLIENT='U'+Math.floor(Math.random()*1e9)+'-'+Date.now().toString(36); setStore('bb_client_id',CLIENT)}
+function sessKeyFor(profileId){return 'bb_sess_v311_'+CLIENT+'__'+profileId}
+var PROFILES=getStore('bb_profiles',[{id:'p1',name:'Профиль 1'}]);
+var ACTIVE=getStore('bb_active_profile',PROFILES[0].id);
+function getActiveProfile(){return ACTIVE}
+function setActiveProfile(id){ACTIVE=id; setStore('bb_active_profile',id)}
+function renderProfiles(){
+  var html=''; for(var i=0;i<PROFILES.length;i++){html+='<option value="'+PROFILES[i].id+'">'+PROFILES[i].name+'</option>'}
+  $('profile-select').innerHTML=html; $('profile-select').value=ACTIVE;
 }
+function addProfile(){
+  var name=prompt('Название профиля:','Профиль '+(PROFILES.length+1)); if(!name) return;
+  var id='p'+Math.floor(Math.random()*1e9).toString(36);
+  PROFILES.push({id:id,name:name}); setStore('bb_profiles',PROFILES); setActiveProfile(id); renderProfiles(); loadSessionForActive()
+}
+function delProfile(){
+  if(PROFILES.length<=1){alert('Нельзя удалить единственный профиль');return}
+  if(!confirm('Удалить текущий профиль? Его сессия тоже будет удалена.')) return;
+  var id=ACTIVE; PROFILES=PROFILES.filter(p=>p.id!==id); setStore('bb_profiles',PROFILES);
+  delStore(sessKeyFor(id));
+  setActiveProfile(PROFILES[0].id); renderProfiles(); loadSessionForActive();
+}
+$('profile-add').addEventListener('click',addProfile);
+$('profile-del').addEventListener('click',delProfile);
+$('profile-select').addEventListener('change',function(){ setActiveProfile(this.value); loadSessionForActive() });
 
-// база
-function renderDB(){
-  var list=DB.slice().sort((a,b)=>a.name.localeCompare(b.name));
-  var html=list.map(b=>(
-    '<div style="padding:10px;border:1px solid #1f2230;border-radius:12px">'+
-    '<div style="font-weight:700">'+b.name+'</div>'+
-    '<div class="kv"><span class="badge">'+b.category+' → '+b.subcat+'</span><span class="badge">'+b.cap_ml+' мл</span><span class="badge">'+b.abv_pct+'%</span><span class="badge">'+b.tare_g+' г</span></div>'+
-    '</div>'
-  )).join('');
-  $('db-list').innerHTML=html;
+// СЕССИЯ (по активному профилю)
+var SESS={id:null,rows:[]};
+function saveSESS(){ setStore(sessKeyFor(getActiveProfile()), SESS) }
+function loadSessionForActive(){
+  var st=getStore(sessKeyFor(getActiveProfile()),null);
+  SESS = st || {id:null,rows:[]}; renderSess();
 }
-function catsOptionsHtml(){return Object.keys(CATEGORIES).map(c=>'<option>'+c+'</option>').join('')}
-function subsOptionsHtml(cat){return (CATEGORIES[cat]||[]).map(s=>'<option>'+s+'</option>').join('')}
-function openModal(){$('m-cat').innerHTML=catsOptionsHtml();$('m-sub').innerHTML=subsOptionsHtml($('m-cat').value);$('m-name').value='';$('m-cap').value='';$('m-abv').value='';$('m-tare').value='';$('m-msg').textContent='';$('modal').classList.remove('hidden')}
-function closeModal(){$('modal').classList.add('hidden')}
-function addBottle(){
-  var cat=$('m-cat').value, sub=$('m-sub').value, name=$('m-name').value, cap=Number($('m-cap').value), abv=Number($('m-abv').value), tare=Number($('m-tare').value);
-  if(!name||!cap||!abv||!tare){$('m-msg').textContent='Заполните все поля';return}
-  var key=uniqKey(name,cat,sub); for(var i=0;i<DB.length;i++){if(uniqKey(DB[i].name,DB[i].category,DB[i].subcat)===key){$('m-msg').textContent='Такая бутылка уже существует';return}}
-  DB.push({id:slug(name),name:name,category:cat,subcat:sub,cap_ml:cap,abv_pct:abv,tare_g:tare}); saveDB(); fillBottles(); renderDB(); $('m-msg').textContent='Сохранено'; setTimeout(closeModal,350)
-}
-function resetDB(){ if(!confirm('Сбросить базу к встроенной?')) return; DB=DEFAULT_DB.slice(); saveDB(); fillBottles(); renderDB() }
-
-// CSV
-function escCSV(s,delim){s=String(s).replace(/"/g,'""');return /["\n\r,;]/.test(s)?('"'+s+'"'):s}
-function toCSV(rows,delim){var BOM='\ufeff';return BOM+rows.map(r=>r.map(x=>escCSV(x,delim)).join(delim)).join('\r\n')+'\r\n'}
-function exportCSV(filename,rows,delim){var blob=new Blob([toCSV(rows,delim||',')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},200)}
-function detectDelim(line){var c1=(line.match(/,/g)||[]).length,c2=(line.match(/;/g)||[]).length;return c2>c1?';':','}
-function parseCSV(text){
-  var rows=[],row=[],field='',inQ=false,delim=detectDelim((text.split(/\r?\n/)[0]||'')); 
-  for(var i=0;i<text.length;i++){var ch=text[i];
-    if(inQ){ if(ch=='"'){ if(text[i+1]=='"'){field+='"';i++} else inQ=false } else field+=ch }
-    else{ if(ch=='"') inQ=true; else if(ch===delim){row.push(field);field=''} else if(ch=='\n'){row.push(field);rows.push(row);row=[];field=''} else if(ch!='\r'){field+=ch} }
-  }
-  if(field!==''||row.length){row.push(field);rows.push(row)}
-  return rows.filter(r=>r.join('').trim()!=='')
-}
-function importCSVFile(file){
-  var fr=new FileReader(); fr.onload=function(){
-    var rows=parseCSV(fr.result||''); if(!rows.length){$('db-msg').textContent='CSV пуст';return}
-    var head=rows[0].map(s=>String(s||'').trim().toLowerCase());
-    var idx={name:head.indexOf('name'),category:head.indexOf('category'),subcat:head.indexOf('subcat'),cap_ml:head.indexOf('cap_ml'),abv_pct:head.indexOf('abv_pct'),tare_g:head.indexOf('tare_g')};
-    var data=[];
-    for(var r=1;r<rows.length;r++){var rw=rows[r]; var name=rw[idx.name]; if(!name) continue;
-      data.push({name:name,category:rw[idx.category]||'Другое',subcat:rw[idx.subcat]||'',cap_ml:Number(rw[idx.cap_ml]||0),abv_pct:Number(rw[idx.abv_pct]||0),tare_g:Number(rw[idx.tare_g]||0)})
-    }
-    var added=0,dup=0;
-    data.forEach(b=>{var key=uniqKey(b.name,b.category,b.subcat),exists=DB.some(x=>uniqKey(x.name,x.category,x.subcat)===key); if(exists){dup++}else{DB.push({id:slug(b.name),...b});added++}});
-    saveDB(); fillBottles(); renderDB(); $('db-msg').textContent='Импорт CSV: добавлено '+added+', дубликатов '+dup;
-  }; fr.readAsText(file,'utf-8')
-}
-
-// сессия
-var SESS=getStore('bb_sess_v311',{id:null,rows:[]}); function saveSESS(){setStore('bb_sess_v311',SESS)}
-function sessNew(){SESS={id:('S'+Math.floor(Date.now()/1000)),rows:[]};saveSESS();renderSess()}
+function sessNew(){SESS={id:('S'+Math.floor(Date.now()/1000)),rows:[]}; saveSESS(); renderSess()}
 function sessBottleList(q){var list=DB.slice(); if(q){var st=String(q).toLowerCase(); list=list.filter(x=>x.name.toLowerCase().includes(st))} list.sort((a,b)=>a.name.localeCompare(b.name)); $('sess-bottle').innerHTML=list.map(x=>'<option value="'+x.id+'">'+x.name+'</option>').join('')}
 function sessAddRow(){var id=$('sess-bottle').value,b=DBMAP()[id]; if(!b) return; SESS.rows.push({id:id,name:b.name,gross:0,hTot:0,hLiq:0,vol:0,pct:0}); saveSESS(); renderSess()}
 function sessDel(i){SESS.rows.splice(i,1);saveSESS();renderSess()}
@@ -385,13 +350,133 @@ function renderSess(){
   })(rows[j])}
 }
 
+// экспорт
+function escCSV(s){s=String(s).replace(/"/g,'""');return /["\n\r,;]/.test(s)?('"'+s+'"'):s}
+function toCSV(rows,delim){var BOM='\ufeff';return BOM+rows.map(r=>r.map(x=>escCSV(x)).join(delim)).join('\r\n')+'\r\n'}
+function exportCSV(filename,rows,delim){var blob=new Blob([toCSV(rows,delim||',')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},200)}
+function detectDelim(line){var c1=(line.match(/,/g)||[]).length,c2=(line.match(/;/g)||[]).length;return c2>c1?';':','}
+function parseCSV(text){
+  var rows=[],row=[],field='',inQ=false,delim=detectDelim((text.split(/\r?\n/)[0]||'')); 
+  for(var i=0;i<text.length;i++){var ch=text[i];
+    if(inQ){ if(ch=='"'){ if(text[i+1]=='"'){field+='"';i++} else inQ=false } else field+=ch }
+    else{ if(ch=='"') inQ=true; else if(ch===delim){row.push(field);field=''} else if(ch=='\n'){row.push(field);rows.push(row);row=[];field=''} else if(ch!='\r'){field+=ch} }
+  }
+  if(field!==''||row.length){row.push(field);rows.push(row)}
+  return rows.filter(r=>r.join('').trim()!=='')
+}
+
+// импорт/экспорт БД + удаление позиции
+function exportDB(){
+  var rows=[['id','name','category','subcat','cap_ml','abv_pct','tare_g']]; 
+  DB.forEach(b=>rows.push([b.id,b.name,b.category,b.subcat,b.cap_ml,b.abv_pct,b.tare_g]));
+  exportCSV('barboss-db.csv',rows,$('csv-delim').value||',')
+}
+function importCSVFile(file){
+  var fr=new FileReader(); fr.onload=function(){
+    var rows=parseCSV(fr.result||''); if(!rows.length){$('db-msg').textContent='CSV пуст';return}
+    var head=rows[0].map(s=>String(s||'').trim().toLowerCase());
+    var idx={name:head.indexOf('name'),category:head.indexOf('category'),subcat:head.indexOf('subcat'),cap_ml:head.indexOf('cap_ml'),abv_pct:head.indexOf('abv_pct'),tare_g:head.indexOf('tare_g')};
+    var added=0,dup=0;
+    for(var r=1;r<rows.length;r++){
+      var rw=rows[r]; var name=rw[idx.name]; if(!name) continue;
+      var cat=rw[idx.category]||'Другое', sub=rw[idx.subcat]||'', cap=Number(rw[idx.cap_ml]||0), abv=Number(rw[idx.abv_pct]||0), tare=Number(rw[idx.tare_g]||0);
+      var key=uniqKey(name,cat,sub), exists=DB.some(x=>uniqKey(x.name,x.category,x.subcat)===key);
+      if(exists){dup++}else{DB.push({id:slug(name),name:name,category:cat,subcat:sub,cap_ml:cap,abv_pct:abv,tare_g:tare}); added++}
+    }
+    saveDB(); renderDBAccordion(); $('db-msg').textContent='Импорт: добавлено '+added+', дубликатов '+dup;
+  }; fr.readAsText(file,'utf-8')
+}
+function deleteBottle(id){
+  var b=DBMAP()[id]; if(!b) return;
+  if(!confirm('Удалить «'+b.name+'» из базы?')) return;
+  DB = DB.filter(x=>x.id!==id); saveDB(); renderDBAccordion();
+}
+
+// компактная БД: аккордеон
+function renderDBAccordion(){
+  var q=String($('db-search').value||'').toLowerCase();
+  var data={}; // category -> subcat -> [items]
+  DB.forEach(b=>{
+    if(q && !b.name.toLowerCase().includes(q)) return;
+    if(!data[b.category]) data[b.category]={_count:0};
+    if(!data[b.category][b.subcat]) data[b.category][b.subcat]=[];
+    data[b.category][b.subcat].push(b); data[b.category]._count++;
+  });
+  var html='';
+  Object.keys(data).sort().forEach(cat=>{
+    var groups=data[cat]; var count=groups._count||0;
+    html+='<details><summary><span class="cat-title">'+cat+'</span><span class="muted">('+count+')</span></summary>';
+    Object.keys(groups).filter(k=>k!=='_count').sort().forEach(sub=>{
+      var arr=groups[sub].slice().sort((a,b)=>a.name.localeCompare(b.name));
+      html+='<div class="subgroup"><div class="sub-title">'+(sub||'Без подкатегории')+' <span class="muted">('+arr.length+')</span></div>';
+      arr.forEach(b=>{
+        html+='<div class="db-item">'+
+              '<div class="db-fields">'+
+              '<div style="font-weight:700">'+b.name+'</div>'+
+              '<span class="badge">'+b.cap_ml+' мл</span>'+
+              '<span class="badge">'+b.abv_pct+'%</span>'+
+              '<span class="badge">'+b.tare_g+' г</span>'+
+              '</div>'+
+              '<div class="db-actions">'+
+              '<button class="small danger" data-del="'+b.id+'">Удалить</button>'+
+              '</div>'+
+              '</div>';
+      });
+      html+='</div>';
+    });
+    html+='</details>';
+  });
+  $('db-accordion').innerHTML=html || '<div class="muted">Нет результатов</div>';
+  qsa('[data-del]').forEach(btn=>btn.addEventListener('click',()=>deleteBottle(btn.getAttribute('data-del'))));
+}
+
+// модал «добавить»
+function catsOptionsHtml(){return Object.keys(CATEGORIES).map(c=>'<option>'+c+'</option>').join('')}
+function subsOptionsHtml(cat){return (CATEGORIES[cat]||[]).map(s=>'<option>'+s+'</option>').join('')}
+function openModal(){$('m-cat').innerHTML=catsOptionsHtml();$('m-sub').innerHTML=subsOptionsHtml($('m-cat').value);$('m-name').value='';$('m-cap').value='';$('m-abv').value='';$('m-tare').value='';$('m-msg').textContent='';$('modal').classList.remove('hidden')}
+function closeModal(){$('modal').classList.add('hidden')}
+function addBottle(){
+  var cat=$('m-cat').value, sub=$('m-sub').value, name=$('m-name').value, cap=Number($('m-cap').value), abv=Number($('m-abv').value), tare=Number($('m-tare').value);
+  if(!name||!cap||!abv||!tare){$('m-msg').textContent='Заполните все поля';return}
+  var key=uniqKey(name,cat,sub); for(var i=0;i<DB.length;i++){if(uniqKey(DB[i].name,DB[i].category,DB[i].subcat)===key){$('m-msg').textContent='Такая бутылка уже существует';return}}
+  DB.push({id:slug(name),name:name,category:cat,subcat:sub,cap_ml:cap,abv_pct:abv,tare_g:tare}); saveDB(); renderDBAccordion(); fillBottles(); $('m-msg').textContent='Сохранено'; setTimeout(closeModal,350)
+}
+
+// калькуляция + автодобавление в сессию
+function calculate(){
+  if(!validateCalc())return;
+  var b=DBMAP()[$('bottle-select').value]; if(!b){$('note').textContent='Выберите бутылку';return}
+  var gross=Number($('gross').value), hTot=Number($('hTot').value), hLiq=Number($('hLiq').value);
+  var net=Math.max(0,gross-b.tare_g), vM=vMass(net,b.abv_pct), vG=vGeom(b.cap_ml,hLiq,hTot);
+  var V=(vM>0&&vG>0)?(vM+vG)/2:(vM>0?vM:vG);
+  V=Math.max(0,Math.min(b.cap_ml,V)); var pct=b.cap_ml?Math.max(0,Math.min(100,V/b.cap_ml*100)):0;
+  $('res').innerHTML='<div class="big">≈ '+fmt(V)+' мл</div><div class="kv"><span class="badge">по массе: '+fmt(vM)+' мл</span><span class="badge">по высоте: '+fmt(vG)+' мл</span><span class="badge">заполнено ≈ '+fmt(pct)+'%</span></div>';
+  if($('auto-session').checked){ if(!SESS.id) sessNew(); SESS.rows.push({id:b.id,name:b.name,gross:gross,hTot:hTot,hLiq:hLiq,vol:V,pct:pct}); saveSESS(); renderSess(); }
+}
+
 // инициализация
 function init(){
-  fillCats(); fillSubs(); fillBottles(); renderDB(); sessBottleList(''); renderSess(); loadCalcState();
+  // профили
+  renderProfiles(); loadSessionForActive();
+
+  // калькулятор
+  fillCats(); fillSubs(); fillBottles(); loadCalcState();
+
+  // база
+  renderDBAccordion();
+
+  // автодобавление — по умолчанию включено
+  var AUTO=getStore('bb_auto_session',true); $('auto-session').checked=!!AUTO;
+  $('auto-session').addEventListener('change',function(){setStore('bb_auto_session',this.checked)});
 }
 init();
 
 // события
+document.querySelector('[data-tab="calc"]').addEventListener('click',()=>switchTab('calc'));
+document.querySelector('[data-tab="db"]').addEventListener('click',()=>switchTab('db'));
+document.querySelector('[data-tab="session"]').addEventListener('click',()=>switchTab('session'));
+function switchTab(key){['calc','db','session'].forEach(id=>{$('tab-'+id).classList.toggle('hidden',id!==key)}); qsa('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===key))}
+
 $('cat-select').addEventListener('change',()=>{fillSubs(); fillBottles(); saveCalcState()});
 $('subcat-select').addEventListener('change',()=>{fillBottles(); saveCalcState()});
 $('search-bottle').addEventListener('input',()=>{fillBottles(); saveCalcState()});
@@ -400,21 +485,16 @@ qsa('#gross,#hTot,#hLiq').forEach(el=>el.addEventListener('input',()=>{validateC
 $('calc').addEventListener('click',calculate);
 $('btn-refresh').addEventListener('click',()=>{location.replace(location.pathname+'?v='+VER.replace(/\./g,'')+'-'+Date.now())});
 
-document.querySelector('[data-tab="calc"]').addEventListener('click',()=>switchTab('calc'));
-document.querySelector('[data-tab="db"]').addEventListener('click',()=>switchTab('db'));
-document.querySelector('[data-tab="session"]').addEventListener('click',()=>switchTab('session'));
-function switchTab(key){['calc','db','session'].forEach(id=>{var sec=$('tab-'+id); sec.classList.toggle('hidden',id!==key);}); qsa('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===key));}
-
 // модал
 $('btn-add-bottle').addEventListener('click',openModal); $('db-add').addEventListener('click',openModal);
 $('m-cat').addEventListener('change',()=>{$('m-sub').innerHTML=subsOptionsHtml($('m-cat').value)});
 $('m-save').addEventListener('click',addBottle); $('m-cancel').addEventListener('click',closeModal);
 
 // база
-$('db-reset').addEventListener('click',resetDB);
-$('db-export-csv').addEventListener('click',()=>{var rows=[['id','name','category','subcat','cap_ml','abv_pct','tare_g']]; DB.forEach(b=>rows.push([b.id,b.name,b.category,b.subcat,b.cap_ml,b.abv_pct,b.tare_g])); exportCSV('barboss-db.csv',rows,$('csv-delim').value||',')});
+$('db-export-csv').addEventListener('click',exportDB);
 $('db-import-csv').addEventListener('click',()=>$('file-csv').click());
 $('file-csv').addEventListener('change',function(){if(this.files&&this.files[0]) importCSVFile(this.files[0]); this.value=''});
+$('db-search').addEventListener('input',renderDBAccordion);
 
 // сессия
 $('sess-new').addEventListener('click',sessNew);
